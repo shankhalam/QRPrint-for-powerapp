@@ -1,144 +1,132 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>QR Sticker - Zebra 50x30mm</title>
-<style>
-  /* Zebra 50mm x 30mm label size */
-  @page {
-    size: 10cm 5cm;
-    margin: 0;
-  }
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Zebra Shipment Labels</title>
+    <style>
+        /* Zebra 10cm x 6cm label size */
+        @page {
+            size: 10cm 6cm;
+            margin: 0;
+        }
 
-  body {
-    margin: 0;
-    padding: 0;
-    font-family: Arial, sans-serif;
-    background: #fff;
-  }
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #fff;
+        }
 
-  .qr-item {
-    width: 10cm;
-    height: 6cm;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: center;
-    text-align: center;
-    box-sizing: border-box;
-    padding: 0mm;
-    page-break-after: always;   
-   
-  }
+        .qr-item {
+            width: 10cm;
+            height: 6cm;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            box-sizing: border-box;
+            padding: 5mm;
+            page-break-after: always;
+            border-bottom: 1px dashed #eee; /* Visual cut line for preview */
+        }
 
-  .top-label {
-    font-size: 8pt !important;
-    font-weight: bold;
-    margin-bottom: 1.5mm;
-    
-  }
+        .header-store {
+            font-size: 10pt;
+            font-weight: 800;
+            color: #333;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 2mm;
+        }
 
-  .qr-item img {
-    width: 3cm;
-    height: 3cm;
-    object-fit: contain;
-    margin: 0 auto;
-    display: block;
-  }
+        .qr-item img {
+            width: 3.2cm;
+            height: 3.2cm;
+            object-fit: contain;
+            margin: 0 auto;
+        }
 
-  .pharmacy-name {
-    font-size: 12pt !important;
-    font-weight: bold;
-    margin-top: 1.5mm;
-  }
+        .pharmacy-name {
+            font-size: 14pt !important;
+            font-weight: bold;
+            color: #000;
+            margin-top: 2mm;
+            line-height: 1.2;
+        }
 
-  .packer-name {
-    font-size: 8pt;
-    margin-top:0.5mm;
-    font-weight: 600;
-  }
+        .details-row {
+            font-size: 9pt;
+            margin-top: 1mm;
+            color: #444;
+            display: flex;
+            gap: 10px;
+        }
 
-  .label {
-    font-size: 7pt;
-    line-height: 1;
-    word-break: break-word;
-    text-align: center;
-  }
+        .tr-numbers {
+            font-size: 8pt;
+            font-weight: 600;
+            margin-top: 1mm;
+            max-width: 90%;
+            word-break: break-all;
+        }
 
-  @media print {
-    body {
-      margin: 0;
-    }
-    .qr-item {
-      page-break-after: always;
-      break-after: page;
-    }
-  }
-</style>
+        @media print {
+            body { margin: 0; }
+            .qr-item { 
+                page-break-after: always; 
+                break-after: page; 
+                border-bottom: none; 
+            }
+        }
+    </style>
 </head>
-
 <body>
-  <div id="qrContainer">Loading QR Codes...</div>
+    <div id="qrContainer">Loading labels...</div>
 
-  <script>
-    function getParameterByName(name) {
-      const params = new URLSearchParams(window.location.search);
-      return params.get(name);
-    }
+    <script>
+        function getParameterByName(name) {
+            const params = new URLSearchParams(window.location.search);
+            return params.get(name);
+        }
 
-    const dataParam = getParameterByName('data');
-    const qrContainer = document.getElementById('qrContainer');
+        const dataParam = getParameterByName('data');
+        const qrContainer = document.getElementById('qrContainer');
 
-    if (!dataParam) {
-      qrContainer.innerHTML = '<p style="color:red;">No data found in URL.</p>';
-    } else {
-      try {
-        const decoded = decodeURIComponent(dataParam);
-        const qrData = JSON.parse(decoded);
-        qrContainer.innerHTML = '';
+        if (!dataParam) {
+            qrContainer.innerHTML = '<p style="color:red; padding: 20px;">Error: No shipment data received.</p>';
+        } else {
+            try {
+                const decoded = decodeURIComponent(dataParam);
+                const qrData = JSON.parse(decoded);
+                qrContainer.innerHTML = '';
 
-        qrData.forEach(item => {
-          const qrCodeURL = "https://api.qrserver.com/v1/create-qr-code/?data=" +
-            encodeURIComponent(item.BarcodeID) + "&size=250x250";
+                qrData.forEach(item => {
+                    // Create the QR URL using the SubPackageID from Power Apps
+                    const qrCodeURL = "https://api.qrserver.com/v1/create-qr-code/?data=" + 
+                                     encodeURIComponent(item.SubPackageID) + "&size=300x300";
 
-          const div = document.createElement('div');
-          div.className = 'qr-item';
+                    const div = document.createElement('div');
+                    div.className = 'qr-item';
 
-          const topLabel = document.createElement('div');
-          topLabel.className = 'top-label';
-          topLabel.innerText = 'Medicina Drug Store';
+                    div.innerHTML = `
+                        <div class="header-store">Medicina Drug Store</div>
+                        <img src="${qrCodeURL}" alt="QR Code">
+                        <div class="pharmacy-name">${item.PharmacyName || 'N/A'}</div>
+                        <div class="details-row">
+                            <span><strong>Packer:</strong> ${item.PackerName || 'N/A'}</span>
+                        </div>
+                        <div class="tr-numbers"><strong>TRs:</strong> ${item.TRNo || 'N/A'}</div>
+                        <div style="font-size: 7pt; margin-top: 2mm; color: #888;">${item.SubPackageID}</div>
+                    `;
 
-          const img = document.createElement('img');
-          img.src = qrCodeURL;
-          img.alt = 'QR code for ' + item.BarcodeID;
-
-          const pharmacyName = document.createElement('div');
-          pharmacyName.className = 'pharmacy-name';
-          pharmacyName.innerText = item.PharmacyName || '';
-
-          const packerName = document.createElement('div');
-          packerName.className = 'packer-name';
-          packerName.innerText = item.PackerName ? 'Packer: ' + item.PackerName : '';
-
-          const label = document.createElement('div');
-          label.className = 'label';
-          label.innerHTML =
-            (item.SuffixLabel ? "<div>" + item.SuffixLabel + "</div>" : "") +
-            (item.MedicineName ? "<div>" + item.MedicineName + "</div>" : "");
-
-          div.appendChild(topLabel);
-          div.appendChild(img);
-          div.appendChild(pharmacyName);
-          div.appendChild(packerName);
-          div.appendChild(label);
-
-          qrContainer.appendChild(div);
-        });
-      } catch (e) {
-        qrContainer.innerHTML = '<p style="color:red;">Error parsing QR data.</p>';
-      }
-    }
-  </script>
+                    qrContainer.appendChild(div);
+                });
+            } catch (e) {
+                qrContainer.innerHTML = '<p style="color:red; padding: 20px;">Error: Failed to parse shipment data.</p>';
+            }
+        }
+    </script>
 </body>
 </html>
