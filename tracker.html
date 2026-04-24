@@ -93,7 +93,7 @@
     <script>
     function renderTracker() {
         try {
-            // 1. Get the data from URL
+            // 1. Get and Parse Data from URL
             const urlParams = new URLSearchParams(window.location.search);
             const rawData = urlParams.get('data');
             
@@ -104,14 +104,14 @@
 
             const data = JSON.parse(decodeURIComponent(rawData));
 
-            // 2. Fill Header details
+            // 2. Set Header & Tracking Details
             document.getElementById('pkgQR').src = "https://api.qrserver.com/v1/create-qr-code/?data=" + encodeURIComponent(data.MasterID) + "&size=150x150";
             document.getElementById('trackerIdDisplay').innerText = data.MasterID;
             document.getElementById('pharmacyDisplay').innerText = data.Pharmacy;
             document.getElementById('dateDisplay').innerText = data.Date;
             document.getElementById('cratesTRDisplay').innerText = data.CratesTR || "-";
 
-            // 3. Fill Table Rows (Corrected loop to show Packer Name)
+            // 3. Render Table Rows (One clean loop for all columns including Packer)
             let rowsHtml = "";
             data.Rows.forEach(r => {
                 rowsHtml += `
@@ -122,18 +122,18 @@
                         <td>${r.Bx}</td>
                         <td>${r.F}</td>
                         <td>${r.Bg}</td>
-                        <td>${r.P || '-'}</td>
+                        <td>${r.P || '-'}</td> 
                     </tr>`;
             });
             document.getElementById('tableBody').innerHTML = rowsHtml;
 
-            // 4. Fill Totals
+            // 4. Set Totals
             document.getElementById('totCrates').innerText = data.TC;
             document.getElementById('totBoxes').innerText = data.TBx;
             document.getElementById('totFB').innerText = data.TF;
             document.getElementById('totBags').innerText = data.TBg;
 
-            // 5. Fill Barcodes
+            // 5. Render Barcodes
             let bcHtml = "";
             if (data.Barcodes && Array.isArray(data.Barcodes)) {
                 data.Barcodes.forEach(b => {
@@ -146,7 +146,7 @@
             document.getElementById('barcodeGrid').innerHTML = bcHtml;
 
         } catch (err) {
-            console.error(err);
+            console.error("Print Error:", err);
             document.body.innerHTML = "<h1 style='color:red; text-align:center;'>System Error: " + err.message + "</h1>";
         }
     }
