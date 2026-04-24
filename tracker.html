@@ -7,51 +7,45 @@
         @page { size: A4 portrait; margin: 10mm; }
         body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; padding: 0; color: #000; font-size: 11px; }
         .container { padding: 5mm; }
-        
-        /* HEADER: Logo Left, QR Right */
         header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #000; margin-bottom: 5px; padding-bottom: 5px; }
+        /* Medicina Logo Left */
         .logo-box img { height: 60px; max-width: 150px; object-fit: contain; }
         .qr-header-box { text-align: center; }
         .qr-header-box img { height: 80px; width: 80px; display: block; }
-        
         .title-section { text-align: center; flex-grow: 1; }
-        .title { font-size: 20pt; font-weight: bold; margin: 0; }
-        /* Tracker ID Line */
-        .tracker-id { font-size: 12pt; font-weight: 600; margin-top: 2px; color: #444; }
-
+        /* Updated Title */
+        .title { font-size: 18pt; font-weight: bold; margin: 0; }
+        .tracker-id { font-size: 11pt; font-weight: 600; margin-top: 2px; color: #444; }
         .details-row { display: flex; justify-content: space-between; font-size: 11pt; margin-bottom: 3px; }
-        
-        /* TABLE: Multi-line support for TR/Vouchers */
         table { width: 100%; border-collapse: collapse; margin: 10px 0; }
         th, td { border: 1px solid #999; padding: 6px; text-align: center; vertical-align: top; }
-        /* This CSS ensures Char(10) from Power Apps creates a new line */
         td.multi-line { white-space: pre-wrap; line-height: 1.4; text-align: left; padding-left: 10px; }
         th { background-color: #f2f2f2; font-weight: bold; }
         .total-row { font-weight: bold; background-color: #eee; }
-
-        .footer { display: flex; justify-content: space-between; border-top: 2px solid #000; padding-top: 10px; margin-top: 20px; }
+        .footer { display: flex; justify-content: space-between; border-top: 2px solid #000; padding-top: 10px; margin-top: 15px; }
         .signature-box { border: 1px solid #000; padding: 8px; width: 220px; height: 90px; font-size: 9pt; }
         .sig-line { border-bottom: 1px solid #000; display: inline-block; width: 110px; height: 12px; margin-left: 5px; }
-
+        /* NEW: Acknowledgement & Terms Styles */
+        .ack-section { font-size: 10pt; margin-top: 15px; text-align: justify; border-top: 1px solid #eee; padding-top: 10px; }
+        .terms-section h3 { font-size: 11pt; margin-bottom: 5px; text-decoration: underline; }
+        .terms-section p { font-size: 9.5pt; margin: 0 0 10px 0; line-height: 1.3; }
+        /* Second Page: Smaller Barcodes, No Text */
         .barcodes-page { page-break-before: always; text-align: center; padding-top: 10mm; }
-        .barcode-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; margin-top: 30px; }
-        .barcode-item { border: 1px solid #ccc; padding: 15px; background: #fff; }
-        .barcode-item img { width: 220px; height: 70px; }
+        .barcode-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 20px; }
+        .barcode-item { border: 1px solid #eee; padding: 8px; }
+        .barcode-item img { width: 160px; height: 50px; }
     </style>
 </head>
 <body onload="renderTracker()">
     <div class="container">
         <header>
-            <div class="logo-box"><img id="compLogo" src=""></div>
+            <div class="logo-box"><img src="MedicinaLogo.png" alt="Medicina Logo"></div>
             <div class="title-section">
                 <div class="title">MEDICINA DELIVERY TRACKER</div>
                 <div class="tracker-id">Tracker ID: <span id="trackerIdDisplay"></span></div>
             </div>
-            <div class="qr-header-box">
-                <img id="pkgQR" src="">
-            </div>
+            <div class="qr-header-box"><img id="pkgQR" src=""></div>
         </header>
-
         <div class="details-row">
             <div>From: <strong>Medicina Drug Store</strong></div>
             <div>To: <strong><span id="pharmacyDisplay" style="font-size:13pt;"></span></strong></div>
@@ -60,7 +54,6 @@
             <div>Date: <strong id="dateDisplay"></strong></div>
             <div>Crates TR: <strong id="cratesTRDisplay"></strong></div>
         </div>
-
         <table>
             <thead>
                 <tr>
@@ -75,7 +68,6 @@
                 <td id="totFB"></td><td id="totBags"></td><td></td>
             </tr>
         </table>
-
         <div class="footer">
             <div>Warehouse Lead:<br><strong>Dr. Mohamed Tarek</strong></div>
             <div class="signature-box">
@@ -84,27 +76,32 @@
                 <div style="margin-top:10px;">Signature: <span class="sig-line"></span></div>
             </div>
         </div>
+        <div class="ack-section">
+            I acknowledge that I have received the crates, boxes, and fridge bags listed above and confirm my understanding of the acknowledgement and condition provided in the tracker.<br><br>
+            Kindly refer to the back of the tracker for the Acknowledgement and Condition.
+        </div>
+        <div class="terms-section">
+            <h3>Terms and Conditions</h3>
+            <p>All delivered items shall be subject to inspection upon receipt to verify accuracy, quantity, and condition. Any discrepancies, damages, or other issues must be reported to the Warehouse/Logistics Department within 48 hours of receipt. Claims submitted beyond this timeframe shall not be considered.</p>
+            <p>By accepting the delivery, the recipient acknowledges and agrees to these terms and conditions.</p>
+        </div>
     </div>
-
     <div class="barcodes-page">
         <h2 style="border-bottom: 2px solid #000; padding-bottom: 10px;">Package Barcodes</h2>
         <div class="barcode-grid" id="barcodeGrid"></div>
     </div>
-
     <script>
         function renderTracker() {
             try {
                 const data = JSON.parse(decodeURIComponent(new URLSearchParams(window.location.search).get('data')));
-                
-                document.getElementById('compLogo').src = data.Logo;
                 document.getElementById('pkgQR').src = `https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(data.MasterID)}&size=150x150`;
                 document.getElementById('trackerIdDisplay').innerText = data.MasterID;
                 document.getElementById('pharmacyDisplay').innerText = data.Pharmacy;
                 document.getElementById('dateDisplay').innerText = data.Date;
-                document.getElementById('cratesTRDisplay').innerText = data.CratesTR || "-"; // FIX: Display Crate TR
-                
+                document.getElementById('cratesTRDisplay').innerText = data.CratesTR || "-";
                 let rowsHtml = "";
                 data.Rows.forEach(r => {
+                    // Fix: Ensure Packer (r.P) displays correctly
                     rowsHtml += `<tr><td class="multi-line">${r.TR}</td><td class="multi-line">${r.V}</td><td>${r.C}</td><td>${r.Bx}</td><td>${r.F}</td><td>${r.Bg}</td><td>${r.P || '-'}</td></tr>`;
                 });
                 document.getElementById('tableBody').innerHTML = rowsHtml;
@@ -112,25 +109,17 @@
                 document.getElementById('totBoxes').innerText = data.TBx;
                 document.getElementById('totFB').innerText = data.TF;
                 document.getElementById('totBags').innerText = data.TBg;
-        
-                // FIX: Handle simple string list for barcodes to stop [object Object]
                 let bcHtml = "";
                 data.Barcodes.forEach(b => {
                     const bcValue = (typeof b === 'object') ? (b.BarcodeNumber || b.Value || "") : b;
                     if(bcValue) {
-                        bcHtml += `
-                            <div class="barcode-item">
-                                <img src="https://barcode.tec-it.com/barcode.ashx?data=${bcValue}&code=Code128">
-                                <p style="font-weight:bold; margin-top:5px;">${bcValue}</p>
-                            </div>`;
+                        // Removed the <p> tag to remove barcode text
+                        bcHtml += `<div class="barcode-item"><img src="https://barcode.tec-it.com/barcode.ashx?data=${bcValue}&code=Code128"></div>`;
                     }
                 });
                 document.getElementById('barcodeGrid').innerHTML = bcHtml;
-        
-            } catch (e) {
-                document.body.innerHTML = "<h1 style='color:red;'>Error Loading Tracker Data</h1>";
-            }
-    }
+            } catch (e) { document.body.innerHTML = "<h1 style='color:red;'>Error Loading Data</h1>"; }
+        }
     </script>
 </body>
 </html>
