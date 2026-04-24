@@ -32,7 +32,7 @@
     </style>
 </head>
 <body onload="renderTracker()">
-    <div class="container">
+    <div class="container" id="mainContent">
         <header>
             <div class="logo-box"><img src="MedicinaLogo.png" alt="Medicina Logo"></div>
             <div class="title-section">
@@ -41,6 +41,7 @@
             </div>
             <div class="qr-header-box"><img id="pkgQR" src=""></div>
         </header>
+
         <div class="details-row">
             <div>From: <strong>Medicina Drug Store</strong></div>
             <div>To: <strong><span id="pharmacyDisplay" style="font-size:13pt;"></span></strong></div>
@@ -49,6 +50,7 @@
             <div>Date: <strong id="dateDisplay"></strong></div>
             <div>Crates TR: <strong id="cratesTRDisplay"></strong></div>
         </div>
+
         <table>
             <thead>
                 <tr>
@@ -63,6 +65,7 @@
                 <td id="totFB"></td><td id="totBags"></td><td></td>
             </tr>
         </table>
+
         <div class="footer">
             <div>Warehouse Lead:<br><strong>Dr. Mohamed Tarek</strong></div>
             <div class="signature-box">
@@ -71,47 +74,81 @@
                 <div style="margin-top:10px;">Signature: <span class="sig-line"></span></div>
             </div>
         </div>
+
         <div class="ack-section">
             I acknowledge that I have received the crates, boxes, and fridge bags listed above and confirm my understanding of the acknowledgement and condition provided in the tracker.<br><br>
             Kindly refer to the back of the tracker for the Acknowledgement and Condition.
         </div>
         <div class="terms-section">
             <h3>Terms and Conditions</h3>
-            <p>All delivered items shall be subject to inspection upon receipt to verify accuracy, quantity, and condition. Any discrepancies, damages, or other issues must be reported to the Warehouse/Logistics Department within 48 hours of receipt. Claims submitted beyond this timeframe shall not be considered.</p>
-            <p>By accepting the delivery, the recipient acknowledges and agrees to these terms and conditions.</p>
+            <p>All delivered items shall be subject to inspection upon receipt to verify accuracy, quantity, and condition. Any discrepancies, damages, or other issues must be reported to the Warehouse/Logistics Department within 48 hours of receipt.</p>
         </div>
     </div>
+
     <div class="barcodes-page">
         <h2 style="border-bottom: 2px solid #000; padding-bottom: 10px;">Package Barcodes</h2>
         <div class="barcode-grid" id="barcodeGrid"></div>
     </div>
+
     <script>
         function renderTracker() {
             try {
-                const data = JSON.parse(decodeURIComponent(new URLSearchParams(window.location.search).get('data')));
-                document.getElementById('pkgQR').src = `https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(data.MasterID)}&size=150x150`;
+                // 1. Get the data from URL
+                const urlParams = new URLSearchParams(window.location.search);
+                const rawData = urlParams.get('data');
+                
+                if (!rawData) {
+                    document.body.innerHTML = "<h1 style='color:red; text-align:center;'>Error: No data received from Power Apps.</h1>";
+                    return;
+                }
+
+                const data = JSON.parse(decodeURIComponent(rawData));
+
+                // 2. Fill Header info
+                document.getElementById('pkgQR').src = "https://api.qrserver.com/v1/create-qr-code/?data=" + encodeURIComponent(data.MasterID) + "&size=150x150";
                 document.getElementById('trackerIdDisplay').innerText = data.MasterID;
                 document.getElementById('pharmacyDisplay').innerText = data.Pharmacy;
                 document.getElementById('dateDisplay').innerText = data.Date;
                 document.getElementById('cratesTRDisplay').innerText = data.CratesTR || "-";
+
+                // 3. Fill Table Rows
                 let rowsHtml = "";
                 data.Rows.forEach(r => {
-                    rowsHtml += `<tr><td class="multi-line">${r.TR}</td><td class="multi-line">${r.V}</td><td>${r.C}</td><td>${r.Bx}</td><td>${r.F}</td><td>${r.Bg}</td><td>${r.P || '-'}</td></tr>`;
+                    rowsHtml += `
+                        <tr>
+                            <td class="multi-line">${r.TR}</td>
+                            <td class="multi-line">${r.V}</td>
+                            <td>${r.C}</td>
+                            <td>${r.Bx}</td>
+                            <td>${r.F}</td>
+                            <td>${r.Bg}</td>
+                            <td>${r.P || '-'}</td>
+                        </tr>`;
                 });
                 document.getElementById('tableBody').innerHTML = rowsHtml;
+
+                // 4. Fill Totals
                 document.getElementById('totCrates').innerText = data.TC;
                 document.getElementById('totBoxes').innerText = data.TBx;
                 document.getElementById('totFB').innerText = data.TF;
                 document.getElementById('totBags').innerText = data.TBg;
+
+                // 5. Fill Barcodes
                 let bcHtml = "";
-                data.Barcodes.forEach(b => {
-                    const codeValue = typeof b === 'object' ? b.Code : b;
-                    if(codeValue) {
-                        bcHtml += `<div class="barcode-item"><img src="https://barcode.tec-it.com/barcode.ashx?data=${codeValue}&code=Code128"></div>`;
-                    }
-                });
+                if (data.Barcodes && Array.isArray(data.Barcodes)) {
+                    data.Barcodes.forEach(b => {
+                        const codeValue = typeof b === 'object' ? (b.Code || b.BarcodeNumber) : b;
+                        if(codeValue) {
+                            bcHtml += `<div class="barcode-item"><img src="https://barcode.tec-it.com/barcode.ashx?data=${codeValue}&code=Code128"></div>`;
+                        }
+                    });
+                }
                 document.getElementById('barcodeGrid').innerHTML = bcHtml;
-            } catch (e) { document.body.innerHTML = "<h1 style='color:red;'>Error Loading Tracker</h1>"; }
+
+            } catch (err) {
+                console.error(err);
+                document.body.innerHTML = "<h1 style='color:red; text-align:center;'>JSON Error: " + err.message + "</h1>";
+            }
         }
     </script>
 </body>
