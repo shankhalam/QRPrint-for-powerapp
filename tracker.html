@@ -90,7 +90,7 @@
         <div class="barcode-grid" id="barcodeGrid"></div>
     </div>
 
-    <script>
+<script>
     function renderTracker() {
         try {
             const urlParams = new URLSearchParams(window.location.search);
@@ -99,14 +99,14 @@
 
             const data = JSON.parse(decodeURIComponent(rawData));
 
-            // Fill Header Info
+            // 1. Fill Header info
             document.getElementById('pkgQR').src = `https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(data.MasterID)}&size=150x150`;
             document.getElementById('trackerIdDisplay').innerText = data.MasterID;
             document.getElementById('pharmacyDisplay').innerText = data.Pharmacy;
             document.getElementById('dateDisplay').innerText = data.Date;
             document.getElementById('cratesTRDisplay').innerText = data.CratesTR || "-";
 
-            // Fill Table Rows (Correctly mapping 'P')
+            // 2. Fill Table Rows (The critical part for Packer Name)
             let rowsHtml = "";
             data.Rows.forEach(r => {
                 rowsHtml += `
@@ -122,13 +122,13 @@
             });
             document.getElementById('tableBody').innerHTML = rowsHtml;
 
-            // Fill Totals
+            // 3. Fill Totals
             document.getElementById('totCrates').innerText = data.TC;
             document.getElementById('totBoxes').innerText = data.TBx;
             document.getElementById('totFB').innerText = data.TF;
             document.getElementById('totBags').innerText = data.TBg;
 
-            // Fill Barcodes
+            // 4. Fill Barcodes
             let bcHtml = "";
             data.Barcodes.forEach(b => {
                 const codeValue = typeof b === 'object' ? (b.Code || b.BarcodeNumber) : b;
@@ -139,10 +139,10 @@
             document.getElementById('barcodeGrid').innerHTML = bcHtml;
 
         } catch (e) {
-            console.error(e);
-            document.body.innerHTML = "<h1 style='color:red;'>Error Loading Data</h1>";
+            console.error("Rendering Error:", e);
+            document.body.innerHTML = "<h1 style='color:red; text-align:center;'>Error Loading Tracker: Check your Power Apps Data</h1>";
         }
     }
-    </script>
+</script>
 </body>
 </html>
