@@ -1,120 +1,23 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Medicina Delivery Tracker</title>
-    <style>
-        @page { size: A4 portrait; margin: 10mm; }
-        body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; padding: 0; color: #000; font-size: 11px; }
-        .container { padding: 5mm; }
-        header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #000; margin-bottom: 5px; padding-bottom: 5px; }
-        .logo-box img { height: 65px; max-width: 160px; object-fit: contain; }
-        .qr-header-box img { height: 80px; width: 80px; }
-        .title-section { text-align: center; flex-grow: 1; }
-        .title { font-size: 18pt; font-weight: bold; margin: 0; }
-        .tracker-id { font-size: 11pt; font-weight: 600; margin-top: 2px; color: #444; }
-        .details-row { display: flex; justify-content: space-between; font-size: 11pt; margin-bottom: 3px; }
-        table { width: 100%; border-collapse: collapse; margin: 10px 0; }
-        th, td { border: 1px solid #999; padding: 6px; text-align: center; vertical-align: top; }
-        td.multi-line { white-space: pre-wrap; line-height: 1.4; text-align: left; padding-left: 10px; }
-        th { background-color: #f2f2f2; font-weight: bold; }
-        .total-row { font-weight: bold; background-color: #eee; }
-        .footer { display: flex; justify-content: space-between; border-top: 2px solid #000; padding-top: 10px; margin-top: 15px; }
-        .signature-box { border: 1px solid #000; padding: 8px; width: 220px; height: 90px; font-size: 9pt; }
-        .sig-line { border-bottom: 1px solid #000; display: inline-block; width: 110px; height: 12px; margin-left: 5px; }
-        .ack-section { font-size: 10pt; margin-top: 15px; text-align: justify; border-top: 1px solid #eee; padding-top: 10px; }
-        .terms-section h3 { font-size: 11pt; margin-bottom: 5px; text-decoration: underline; }
-        .terms-section p { font-size: 9.5pt; margin: 0 0 10px 0; line-height: 1.3; }
-        .barcodes-page { page-break-before: always; text-align: center; padding-top: 10mm; }
-        .barcode-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 20px; }
-        .barcode-item { border: 1px solid #eee; padding: 5px; }
-        .barcode-item img { width: 150px; height: 45px; }
-    </style>
-</head>
-<body onload="renderTracker()">
-    <div class="container">
-        <header>
-            <div class="logo-box"><img src="MedicinaLogo.png" alt="Medicina Logo"></div>
-            <div class="title-section">
-                <div class="title">MEDICINA DELIVERY TRACKER</div>
-                <div class="tracker-id">Tracker ID: <span id="trackerIdDisplay"></span></div>
-            </div>
-            <div class="qr-header-box"><img id="pkgQR" src=""></div>
-        </header>
-        <div class="details-row">
-            <div>From: <strong>Medicina Drug Store</strong></div>
-            <div>To: <strong><span id="pharmacyDisplay" style="font-size:13pt;"></span></strong></div>
-        </div>
-        <div class="details-row">
-            <div>Date: <strong id="dateDisplay"></strong></div>
-            <div>Crates TR: <strong id="cratesTRDisplay"></strong></div>
-        </div>
-        <table>
-            <thead>
-                <tr>
-                    <th>TRANSFER NUMBER</th><th>VOUCHER NUMBER</th><th>CRATES</th>
-                    <th>BOX</th><th>FRIDGE BAG</th><th>BAG</th><th>PACKER</th>
-                </tr>
-            </thead>
-            <tbody id="tableBody"></tbody>
-            <tr class="total-row">
-                <td colspan="2">TOTAL</td>
-                <td id="totCrates"></td><td id="totBoxes"></td>
-                <td id="totFB"></td><td id="totBags"></td><td></td>
-            </tr>
-        </table>
-        <div class="footer">
-            <div>Warehouse Lead:<br><strong>Dr. Mohamed Tarek</strong></div>
-            <div class="signature-box">
-                <div>Received By: <span class="sig-line"></span></div>
-                <div style="margin-top:10px;">Date: <span class="sig-line"></span></div>
-                <div style="margin-top:10px;">Signature: <span class="sig-line"></span></div>
-            </div>
-        </div>
-        <div class="ack-section">
-            I acknowledge that I have received the crates, boxes, and fridge bags listed above and confirm my understanding of the acknowledgement and condition provided in the tracker.<br><br>
-            Kindly refer to the back of the tracker for the Acknowledgement and Condition.
-        </div>
-        <div class="terms-section">
-            <h3>Terms and Conditions</h3>
-            <p>All delivered items shall be subject to inspection upon receipt to verify accuracy, quantity, and condition. Any discrepancies, damages, or other issues must be reported to the Warehouse/Logistics Department within 48 hours of receipt. Claims submitted beyond this timeframe shall not be considered.</p>
-            <p>By accepting the delivery, the recipient acknowledges and agrees to these terms and conditions.</p>
-        </div>
-    </div>
-    <div class="barcodes-page">
-        <h2 style="border-bottom: 2px solid #000; padding-bottom: 10px;">Package Barcodes</h2>
-        <div class="barcode-grid" id="barcodeGrid"></div>
-    </div>
-    <script>
-        function renderTracker() {
-            try {
-                const data = JSON.parse(decodeURIComponent(new URLSearchParams(window.location.search).get('data')));
-                document.getElementById('pkgQR').src = `https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(data.MasterID)}&size=150x150`;
-                document.getElementById('trackerIdDisplay').innerText = data.MasterID;
-                document.getElementById('pharmacyDisplay').innerText = data.Pharmacy;
-                document.getElementById('dateDisplay').innerText = data.Date;
-                document.getElementById('cratesTRDisplay').innerText = data.CratesTR || "-";
-                let rowsHtml = "";
-                data.Rows.forEach(r => {
-                    rowsHtml += `<tr><td class="multi-line">${r.TR}</td><td class="multi-line">${r.V}</td><td>${r.C}</td><td>${r.Bx}</td><td>${r.F}</td><td>${r.Bg}</td><td>${r.P || '-'}</td></tr>`;
-                });
-                document.getElementById('tableBody').innerHTML = rowsHtml;
-                document.getElementById('totCrates').innerText = data.TC;
-                document.getElementById('totBoxes').innerText = data.TBx;
-                document.getElementById('totFB').innerText = data.TF;
-                document.getElementById('totBags').innerText = data.TBg;
-                let bcHtml = "";
-                data.Barcodes.forEach(b => {
-                    const codeValue = typeof b === 'object' ? b.Code : b;
-                    if(codeValue) {
-                        bcHtml += `<div class="barcode-item"><img src="https://barcode.tec-it.com/barcode.ashx?data=${codeValue}&code=Code128"></div>`;
-                    }
-                });
-                document.getElementById('barcodeGrid').innerHTML = bcHtml;
-            } catch (e) { document.body.innerHTML = "<h1 style='color:red;'>Error Loading Tracker</h1>"; }
+<script>
+    function renderTracker() {
+        try {
+            // 1. Get and Parse Data
+            const urlParams = new URLSearchParams(window.location.search);
+            const dataParam = urlParams.get('data');
+            if (!dataParam) throw new Error("No data");
+            
+            const data = JSON.parse(decodeURIComponent(dataParam));
+
+            // 2. Set Header Details
+            document.getElementById('pkgQR').src = `https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(data.MasterID)}&size=150x150`;
+            document.getElementById('trackerIdDisplay').innerText = data.MasterID;
+            document.getElementById('pharmacyDisplay').innerText = data.Pharmacy;
+            document.getElementById('dateDisplay').innerText = data.Date;
+            document.getElementById('cratesTRDisplay').innerText = data.CratesTR || "-";
+
+            // 3. Render Table Rows (One clean loop)
             let rowsHtml = "";
             data.Rows.forEach(r => {
-                // Ensure r.P is used to display the Packer Name
                 rowsHtml += `
                     <tr>
                         <td class="multi-line">${r.TR}</td>
@@ -127,7 +30,26 @@
                     </tr>`;
             });
             document.getElementById('tableBody').innerHTML = rowsHtml;
+
+            // 4. Set Totals
+            document.getElementById('totCrates').innerText = data.TC;
+            document.getElementById('totBoxes').innerText = data.TBx;
+            document.getElementById('totFB').innerText = data.TF;
+            document.getElementById('totBags').innerText = data.TBg;
+
+            // 5. Render Barcodes
+            let bcHtml = "";
+            data.Barcodes.forEach(b => {
+                const codeValue = typeof b === 'object' ? (b.Code || b.BarcodeNumber) : b;
+                if(codeValue) {
+                    bcHtml += `<div class="barcode-item"><img src="https://barcode.tec-it.com/barcode.ashx?data=${codeValue}&code=Code128"></div>`;
+                }
+            });
+            document.getElementById('barcodeGrid').innerHTML = bcHtml;
+
+        } catch (e) {
+            console.error(e);
+            document.body.innerHTML = "<h1 style='color:red;'>Error Loading Tracker Data</h1>";
         }
-    </script>
-</body>
-</html>
+    }
+</script>
