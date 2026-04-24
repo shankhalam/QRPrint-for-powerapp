@@ -93,41 +93,43 @@
 
     <script>
         function renderTracker() {
-            try {
-                const data = JSON.parse(decodeURIComponent(new URLSearchParams(window.location.search).get('data')));
-                
-                document.getElementById('compLogo').src = data.Logo;
-                // 1. QR Code is strictly the Package ID (MasterID)
-                document.getElementById('pkgQR').src = `https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(data.MasterID)}&size=150x150`;
-                // 2. Display Tracker ID below the title
-                document.getElementById('trackerIdDisplay').innerText = data.MasterID;
-                
-                document.getElementById('pharmacyDisplay').innerText = data.Pharmacy;
-                document.getElementById('dateDisplay').innerText = data.Date;
-                document.getElementById('cratesTRDisplay').innerText = data.CratesTR || "-";
-                
-                let rowsHtml = "";
-                data.Rows.forEach(r => {
-                    // 3. Applying the 'multi-line' class to TR and Voucher cells
-                    rowsHtml += `<tr><td class="multi-line">${r.TR}</td><td class="multi-line">${r.V}</td><td>${r.C}</td><td>${r.Bx}</td><td>${r.F}</td><td>${r.Bg}</td><td>${r.P}</td></tr>`;
-                });
-                document.getElementById('tableBody').innerHTML = rowsHtml;
-                document.getElementById('totCrates').innerText = data.TC;
-                document.getElementById('totBoxes').innerText = data.TBx;
-                document.getElementById('totFB').innerText = data.TF;
-                document.getElementById('totBags').innerText = data.TBg;
+    try {
+        const data = JSON.parse(decodeURIComponent(new URLSearchParams(window.location.search).get('data')));
+        
+        document.getElementById('compLogo').src = data.Logo;
+        document.getElementById('pkgQR').src = `https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(data.MasterID)}&size=150x150`;
+        document.getElementById('trackerIdDisplay').innerText = data.MasterID;
+        document.getElementById('pharmacyDisplay').innerText = data.Pharmacy;
+        document.getElementById('dateDisplay').innerText = data.Date;
+        document.getElementById('cratesTRDisplay').innerText = data.CratesTR || "-";
+        
+        let rowsHtml = "";
+        data.Rows.forEach(r => {
+            rowsHtml += `<tr><td class="multi-line">${r.TR}</td><td class="multi-line">${r.V}</td><td>${r.C}</td><td>${r.Bx}</td><td>${r.F}</td><td>${r.Bg}</td><td>${r.P || 'N/A'}</td></tr>`;
+        });
+        document.getElementById('tableBody').innerHTML = rowsHtml;
+        document.getElementById('totCrates').innerText = data.TC;
+        document.getElementById('totBoxes').innerText = data.TBx;
+        document.getElementById('totFB').innerText = data.TF;
+        document.getElementById('totBags').innerText = data.TBg;
 
-                // 4. Render Crate Barcodes on the second page
-                let bcHtml = "";
-                data.Barcodes.forEach(b => {
-                    bcHtml += `<div class="barcode-item"><img src="https://barcode.tec-it.com/barcode.ashx?data=${b}&code=Code128"><p style="font-weight:bold; margin-top:5px;">${b}</p></div>`;
-                });
-                document.getElementById('barcodeGrid').innerHTML = bcHtml;
+        // FIX: Improved Barcode rendering to handle Object structure
+        let bcHtml = "";
+        data.Barcodes.forEach(b => {
+            // Extract the actual barcode number string from the object
+            const bcValue = b.BarcodeNumber || b.Value || b; 
+            bcHtml += `
+                <div class="barcode-item">
+                    <img src="https://barcode.tec-it.com/barcode.ashx?data=${bcValue}&code=Code128">
+                    <p style="font-weight:bold; margin-top:5px;">${bcValue}</p>
+                </div>`;
+        });
+        document.getElementById('barcodeGrid').innerHTML = bcHtml;
 
-            } catch (e) {
-                document.body.innerHTML = "<h1 style='color:red;'>Error Loading Tracker Data</h1>";
-            }
-        }
+    } catch (e) {
+        document.body.innerHTML = "<h1 style='color:red;'>Error Loading Tracker Data</h1>";
+    }
+}
     </script>
 </body>
 </html>
