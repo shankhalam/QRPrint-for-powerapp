@@ -112,6 +112,21 @@
                 });
                 document.getElementById('barcodeGrid').innerHTML = bcHtml;
             } catch (e) { document.body.innerHTML = "<h1 style='color:red;'>Error Loading Tracker</h1>"; }
+            let rowsHtml = "";
+            data.Rows.forEach(r => {
+                // Ensure r.P is used to display the Packer Name
+                rowsHtml += `
+                    <tr>
+                        <td class="multi-line">${r.TR}</td>
+                        <td class="multi-line">${r.V}</td>
+                        <td>${r.C}</td>
+                        <td>${r.Bx}</td>
+                        <td>${r.F}</td>
+                        <td>${r.Bg}</td>
+                        <td>${r.P || 'N/A'}</td> 
+                    </tr>`;
+            });
+            document.getElementById('tableBody').innerHTML = rowsHtml;
         }
     </script>
 </body>
