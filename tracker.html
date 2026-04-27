@@ -38,9 +38,22 @@
         .barcode-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 20px; }
         .barcode-item { border: 1px solid #eee; padding: 5px; }
         .barcode-item img { width: 150px; height: 45px; }
+
+        /* NEW: Footer Note fixed to the bottom of every printed page */
+        .print-footer {
+            position: fixed;
+            bottom: 5px;
+            right: 15px;
+            font-size: 8pt;
+            color: #666;
+            font-style: italic;
+        }
     </style>
 </head>
 <body onload="renderTracker()">
+    
+    <div class="print-footer">Printed on: <span id="printDate"></span></div>
+
     <div class="container" id="mainContent">
         <header>
             <table class="header-table">
@@ -106,6 +119,7 @@
             <h3>Terms and Conditions</h3>
             <p>All delivered items shall be subject to inspection upon receipt to verify accuracy, quantity, and condition. Any discrepancies, damages, or other issues must be reported to the Warehouse/Logistics Department within 48 hours of receipt.</p>
         </div>
+    </div>
 
     <div class="barcodes-page">
         <h2 style="border-bottom: 2px solid #000; padding-bottom: 10px;">Package Barcodes</h2>
@@ -115,23 +129,27 @@
 <script>
     function renderTracker() {
         try {
+            // 1. Generate the Current Print Date instantly upon loading
+            const now = new Date();
+            const dateOptions = { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' };
+            document.getElementById('printDate').innerText = now.toLocaleDateString('en-GB', dateOptions);
+
             const urlParams = new URLSearchParams(window.location.search);
             const rawData = urlParams.get('data');
             if (!rawData) return;
 
             const data = JSON.parse(decodeURIComponent(rawData));
 
-            // 1. Fill Header info
+            // 2. Fill Header info
             document.getElementById('pkgQR').src = `https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(data.MasterID)}&size=150x150`;
             document.getElementById('trackerIdDisplay').innerText = data.MasterID;
             document.getElementById('pharmacyDisplay').innerText = data.Pharmacy;
             document.getElementById('dateDisplay').innerText = data.Date;
             document.getElementById('cratesTRDisplay').innerText = data.CratesTR || "-";
 
-            // 2. Fill Table Rows 
+            // 3. Fill Table Rows 
             let rowsHtml = "";
             data.Rows.forEach(r => {
-                // ⚡ FIX: Force text to uppercase using JavaScript, which the PDF converter cannot ignore!
                 let safeTR = r.TR ? r.TR.toUpperCase() : "";
                 let safeV = r.V ? r.V.toUpperCase() : "";
 
@@ -148,13 +166,13 @@
             });
             document.getElementById('tableBody').innerHTML = rowsHtml;
 
-            // 3. Fill Totals
+            // 4. Fill Totals
             document.getElementById('totCrates').innerText = data.TC;
             document.getElementById('totBoxes').innerText = data.TBx;
             document.getElementById('totFB').innerText = data.TF;
             document.getElementById('totBags').innerText = data.TBg;
 
-            // 4. Fill Barcodes
+            // 5. Fill Barcodes
             let bcHtml = "";
             data.Barcodes.forEach(b => {
                 const codeValue = typeof b === 'object' ? (b.Code || b.BarcodeNumber) : b;
