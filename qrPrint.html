@@ -41,15 +41,26 @@
                                      encodeURIComponent(item.BarcodeID) + "&size=300x300";
                     
                     // NEW: Ensure TRs are formatted correctly with commas
-                    let displayTRs = "";
+                    // NEW: Extract, clean, and deduplicate TR numbers for the printed label
+                    let rawTRString = "";
                     if (Array.isArray(item.TRNo)) {
-                        displayTRs = item.TRNo.join(', ');
+                        rawTRString = item.TRNo.join(',');
                     } else if (typeof item.TRNo === 'string') {
-                        // Replaces any accidental line breaks with commas
-                        displayTRs = item.TRNo.replace(/\n/g, ', ').replace(/\r/g, '');
+                        rawTRString = item.TRNo;
                     } else {
-                        displayTRs = item.TRNo || '';
+                        rawTRString = String(item.TRNo || '');
                     }
+                    
+                    // 1. Split the string by commas or newlines
+                    // 2. Trim extra spaces from each item
+                    // 3. Filter out any blank empty items
+                    let trArray = rawTRString.split(/[\n,]+/).map(tr => tr.trim()).filter(tr => tr !== '');
+                    
+                    // 4. THE FIX: Use a JavaScript Set to instantly remove all duplicates
+                    let uniqueTRs = [...new Set(trArray)];
+                    
+                    // 5. Join the clean, unique list with commas for printing
+                    let displayTRs = uniqueTRs.join(', ');
 
                     const div = document.createElement('div');
                     div.className = 'qr-item';
