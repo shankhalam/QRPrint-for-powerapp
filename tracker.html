@@ -86,9 +86,14 @@
             </thead>
             <tbody id="tableBody"></tbody>
             <tr class="total-row">
-                <td colspan="3">TOTAL</td>
-                <td id="totCrates"></td><td id="totBoxes"></td>
-                <td id="totFB"></td><td id="totBags"></td><td></td>
+                <td>TOTAL</td>
+                <td id="totTRs"></td>
+                <td id="totVouchers"></td>
+                <td id="totCrates"></td>
+                <td id="totBoxes"></td>
+                <td id="totFB"></td>
+                <td id="totBags"></td>
+                <td></td>
             </tr>
         </table>
         
@@ -127,7 +132,7 @@
 <script>
     function renderTracker() {
         try {
-            // 1. Generate the Current Print Date instantly upon loading
+            // 1. Generate the Current Print Date
             const now = new Date();
             const dateOptions = { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' };
             document.getElementById('printDate').innerText = now.toLocaleDateString('en-GB', dateOptions);
@@ -138,7 +143,7 @@
 
             const data = JSON.parse(decodeURIComponent(rawData));
 
-            // 2. Smart fallback for Header info (checks for multiple possible JSON names)
+            // 2. Fill Header info
             const masterID = data.MasterID || data.PackageData || "";
             document.getElementById('pkgQR').src = `https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(masterID)}&size=150x150`;
             document.getElementById('trackerIdDisplay').innerText = masterID;
@@ -146,17 +151,22 @@
             document.getElementById('dateDisplay').innerText = data.Date || data.ShipDate || "";
             document.getElementById('cratesTRDisplay').innerText = data.CratesTR || "";
 
-            // 3. Fill Table Rows 
+            // 3. Fill Table Rows AND Count TRs/Vouchers
             let rowsHtml = "";
+            let countTR = 0;
+            let countVoucher = 0;
             
             if (data.Rows && Array.isArray(data.Rows)) {
                 data.Rows.forEach((r, index) => {
-                    // 🌟 THE FIX: "Smart Mapping" ensures it catches the data no matter what Power Apps calls it!
                     let valTR = r.TR || r.TRNo || r.TRNumber || "";
                     let valV = r.V || r.Voucher || r.VoucherNumber || "";
                     
-                    let safeTR = valTR ? String(valTR).toUpperCase() : "";
-                    let safeV = valV ? String(valV).toUpperCase() : "";
+                    let safeTR = valTR ? String(valTR).toUpperCase().trim() : "";
+                    let safeV = valV ? String(valV).toUpperCase().trim() : "";
+
+                    // 🌟 THE FIX: Count them if they exist
+                    if (safeTR !== "") countTR++;
+                    if (safeV !== "") countVoucher++;
 
                     let valC = r.C !== undefined ? r.C : (r.Crates !== undefined ? r.Crates : "");
                     let valBx = r.Bx !== undefined ? r.Bx : (r.Box !== undefined ? r.Box : "");
@@ -179,7 +189,9 @@
             }
             document.getElementById('tableBody').innerHTML = rowsHtml;
 
-            // 4. Fill Totals (Smart fallback included here too)
+            // 4. Fill Totals (Including the new TR and Voucher counts)
+            document.getElementById('totTRs').innerText = countTR > 0 ? countTR : "";
+            document.getElementById('totVouchers').innerText = countVoucher > 0 ? countVoucher : "";
             document.getElementById('totCrates').innerText = data.TC !== undefined ? data.TC : (data.TotalCrates || "");
             document.getElementById('totBoxes').innerText = data.TBx !== undefined ? data.TBx : (data.TotalBox || data.TotalBoxes || "");
             document.getElementById('totFB').innerText = data.TF !== undefined ? data.TF : (data.TotalFb || "");
