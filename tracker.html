@@ -8,7 +8,6 @@
         body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; padding: 0; color: #000; font-size: 11px; }
         .container { padding: 5mm; }
         
-        /* Changed header to block layout for PDF safety */
         header { border-bottom: 2px solid #000; margin-bottom: 5px; padding-bottom: 5px; width: 100%; }
         .header-table { width: 100%; border: none; margin: 0; }
         .header-table td { border: none; padding: 0; vertical-align: middle; }
@@ -39,7 +38,6 @@
         .barcode-item { border: 1px solid #eee; padding: 5px; }
         .barcode-item img { width: 150px; height: 45px; }
 
-        /* NEW: Footer Note fixed to the bottom of every printed page */
         .print-footer {
             position: fixed;
             bottom: 5px;
@@ -140,49 +138,63 @@
 
             const data = JSON.parse(decodeURIComponent(rawData));
 
-            // 2. Fill Header info
-            document.getElementById('pkgQR').src = `https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(data.MasterID)}&size=150x150`;
-            document.getElementById('trackerIdDisplay').innerText = data.MasterID;
-            document.getElementById('pharmacyDisplay').innerText = data.Pharmacy;
-            document.getElementById('dateDisplay').innerText = data.Date;
-            document.getElementById('cratesTRDisplay').innerText = data.CratesTR || "-";
+            // 2. Smart fallback for Header info (checks for multiple possible JSON names)
+            const masterID = data.MasterID || data.PackageData || "";
+            document.getElementById('pkgQR').src = `https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(masterID)}&size=150x150`;
+            document.getElementById('trackerIdDisplay').innerText = masterID;
+            document.getElementById('pharmacyDisplay').innerText = data.Pharmacy || data.PharmacyName || "";
+            document.getElementById('dateDisplay').innerText = data.Date || data.ShipDate || "";
+            document.getElementById('cratesTRDisplay').innerText = data.CratesTR || "";
 
             // 3. Fill Table Rows 
             let rowsHtml = "";
             
-            // NEW: Added 'index' to the forEach loop to grab the row number
-            data.Rows.forEach((r, index) => {
-                let safeTR = r.TR ? r.TR.toUpperCase() : "";
-                let safeV = r.V ? r.V.toUpperCase() : "";
+            if (data.Rows && Array.isArray(data.Rows)) {
+                data.Rows.forEach((r, index) => {
+                    // 🌟 THE FIX: "Smart Mapping" ensures it catches the data no matter what Power Apps calls it!
+                    let valTR = r.TR || r.TRNo || r.TRNumber || "";
+                    let valV = r.V || r.Voucher || r.VoucherNumber || "";
+                    
+                    let safeTR = valTR ? String(valTR).toUpperCase() : "";
+                    let safeV = valV ? String(valV).toUpperCase() : "";
 
-                rowsHtml += `
-                    <tr>
-                        <td>${index + 1}</td>
-                        <td class="multi-line">${safeTR}</td>
-                        <td class="multi-line">${safeV}</td>
-                        <td>${r.C}</td>
-                        <td>${r.Bx}</td>
-                        <td>${r.F}</td>
-                        <td>${r.Bg}</td>
-                        <td>${r.P || '-'}</td> 
-                    </tr>`;
-            });
+                    let valC = r.C !== undefined ? r.C : (r.Crates !== undefined ? r.Crates : "");
+                    let valBx = r.Bx !== undefined ? r.Bx : (r.Box !== undefined ? r.Box : "");
+                    let valF = r.F !== undefined ? r.F : (r.Fb !== undefined ? r.Fb : "");
+                    let valBg = r.Bg !== undefined ? r.Bg : (r.Bag !== undefined ? r.Bag : "");
+                    let valP = r.P || r.Name || r.PackerName || "-";
+
+                    rowsHtml += `
+                        <tr>
+                            <td>${index + 1}</td>
+                            <td class="multi-line">${safeTR}</td>
+                            <td class="multi-line">${safeV}</td>
+                            <td>${valC}</td>
+                            <td>${valBx}</td>
+                            <td>${valF}</td>
+                            <td>${valBg}</td>
+                            <td>${valP}</td> 
+                        </tr>`;
+                });
+            }
             document.getElementById('tableBody').innerHTML = rowsHtml;
 
-            // 4. Fill Totals
-            document.getElementById('totCrates').innerText = data.TC;
-            document.getElementById('totBoxes').innerText = data.TBx;
-            document.getElementById('totFB').innerText = data.TF;
-            document.getElementById('totBags').innerText = data.TBg;
+            // 4. Fill Totals (Smart fallback included here too)
+            document.getElementById('totCrates').innerText = data.TC !== undefined ? data.TC : (data.TotalCrates || "");
+            document.getElementById('totBoxes').innerText = data.TBx !== undefined ? data.TBx : (data.TotalBox || data.TotalBoxes || "");
+            document.getElementById('totFB').innerText = data.TF !== undefined ? data.TF : (data.TotalFb || "");
+            document.getElementById('totBags').innerText = data.TBg !== undefined ? data.TBg : (data.TotalBag || data.TotalBags || "");
 
             // 5. Fill Barcodes
             let bcHtml = "";
-            data.Barcodes.forEach(b => {
-                const codeValue = typeof b === 'object' ? (b.Code || b.BarcodeNumber) : b;
-                if(codeValue) {
-                    bcHtml += `<div class="barcode-item"><img src="https://barcode.tec-it.com/barcode.ashx?data=${codeValue}&code=Code128"></div>`;
-                }
-            });
+            if (data.Barcodes && Array.isArray(data.Barcodes)) {
+                data.Barcodes.forEach(b => {
+                    const codeValue = typeof b === 'object' ? (b.Code || b.BarcodeNumber) : b;
+                    if(codeValue) {
+                        bcHtml += `<div class="barcode-item"><img src="https://barcode.tec-it.com/barcode.ashx?data=${codeValue}&code=Code128"></div>`;
+                    }
+                });
+            }
             document.getElementById('barcodeGrid').innerHTML = bcHtml;
 
         } catch (e) {
