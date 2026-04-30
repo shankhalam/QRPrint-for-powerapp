@@ -82,13 +82,13 @@
         <table class="data-table">
             <thead>
                 <tr>
-                    <th>TRANSFER NUMBER</th><th>VOUCHER NUMBER</th><th>CRATES</th>
+                    <th>S.NO</th><th>TRANSFER NUMBER</th><th>VOUCHER NUMBER</th><th>CRATES</th>
                     <th>BOX</th><th>FRIDGE BAG</th><th>BAG</th><th>PACKER</th>
                 </tr>
             </thead>
             <tbody id="tableBody"></tbody>
             <tr class="total-row">
-                <td colspan="2">TOTAL</td>
+                <td colspan="3">TOTAL</td>
                 <td id="totCrates"></td><td id="totBoxes"></td>
                 <td id="totFB"></td><td id="totBags"></td><td></td>
             </tr>
@@ -130,63 +130,4 @@
     function renderTracker() {
         try {
             // 1. Generate the Current Print Date instantly upon loading
-            const now = new Date();
-            const dateOptions = { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' };
-            document.getElementById('printDate').innerText = now.toLocaleDateString('en-GB', dateOptions);
-
-            const urlParams = new URLSearchParams(window.location.search);
-            const rawData = urlParams.get('data');
-            if (!rawData) return;
-
-            const data = JSON.parse(decodeURIComponent(rawData));
-
-            // 2. Fill Header info
-            document.getElementById('pkgQR').src = `https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(data.MasterID)}&size=150x150`;
-            document.getElementById('trackerIdDisplay').innerText = data.MasterID;
-            document.getElementById('pharmacyDisplay').innerText = data.Pharmacy;
-            document.getElementById('dateDisplay').innerText = data.Date;
-            document.getElementById('cratesTRDisplay').innerText = data.CratesTR || "-";
-
-            // 3. Fill Table Rows 
-            let rowsHtml = "";
-            data.Rows.forEach(r => {
-                let safeTR = r.TR ? r.TR.toUpperCase() : "";
-                let safeV = r.V ? r.V.toUpperCase() : "";
-
-                rowsHtml += `
-                    <tr>
-                        <td class="multi-line">${safeTR}</td>
-                        <td class="multi-line">${safeV}</td>
-                        <td>${r.C}</td>
-                        <td>${r.Bx}</td>
-                        <td>${r.F}</td>
-                        <td>${r.Bg}</td>
-                        <td>${r.P || '-'}</td> 
-                    </tr>`;
-            });
-            document.getElementById('tableBody').innerHTML = rowsHtml;
-
-            // 4. Fill Totals
-            document.getElementById('totCrates').innerText = data.TC;
-            document.getElementById('totBoxes').innerText = data.TBx;
-            document.getElementById('totFB').innerText = data.TF;
-            document.getElementById('totBags').innerText = data.TBg;
-
-            // 5. Fill Barcodes
-            let bcHtml = "";
-            data.Barcodes.forEach(b => {
-                const codeValue = typeof b === 'object' ? (b.Code || b.BarcodeNumber) : b;
-                if(codeValue) {
-                    bcHtml += `<div class="barcode-item"><img src="https://barcode.tec-it.com/barcode.ashx?data=${codeValue}&code=Code128"></div>`;
-                }
-            });
-            document.getElementById('barcodeGrid').innerHTML = bcHtml;
-
-        } catch (e) {
-            console.error("Rendering Error:", e);
-            document.body.innerHTML = "<h1 style='color:red; text-align:center;'>Error Loading Tracker: Check your Power Apps Data</h1>";
-        }
-    }
-</script>
-</body>
-</html>
+            const now
