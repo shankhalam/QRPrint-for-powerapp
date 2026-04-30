@@ -36,11 +36,11 @@
             try {
                 const qrData = JSON.parse(decodeURIComponent(dataParam));
                 qrContainer.innerHTML = '';
+                
                 qrData.forEach(item => {
                     const qrCodeURL = "https://api.qrserver.com/v1/create-qr-code/?data=" + 
                                      encodeURIComponent(item.BarcodeID) + "&size=300x300";
                     
-                    // NEW: Ensure TRs are formatted correctly with commas
                     // NEW: Extract, clean, and deduplicate TR numbers for the printed label
                     let rawTRString = "";
                     if (Array.isArray(item.TRNo)) {
@@ -50,18 +50,17 @@
                     } else {
                         rawTRString = String(item.TRNo || '');
                     }
-                    
-                    // 1. Split the string by commas or newlines
-                    // 2. Trim extra spaces from each item
-                    // 3. Filter out any blank empty items
+
+                    // 1. Split by commas or newlines, remove extra spaces, and filter out blanks
                     let trArray = rawTRString.split(/[\n,]+/).map(tr => tr.trim()).filter(tr => tr !== '');
-                    
-                    // 4. THE FIX: Use a JavaScript Set to instantly remove all duplicates
+
+                    // 2. Use a Set to instantly remove any duplicates
                     let uniqueTRs = [...new Set(trArray)];
-                    
-                    // 5. Join the clean, unique list with commas for printing
+
+                    // 3. Join the clean, unique list with commas for printing
                     let displayTRs = uniqueTRs.join(', ');
 
+                    // Build the HTML for this specific label
                     const div = document.createElement('div');
                     div.className = 'qr-item';
                     div.innerHTML = `
@@ -69,11 +68,13 @@
                         <img src="${qrCodeURL}">
                         <div class="pharmacy-name">${item.PharmacyName || ''}</div>
                         <div class="container-info">${item.ContainerInfo || ''}</div>
-                        <div class="tr-numbers"><strong>TRs:</strong> ${displayTRs}</div>
+                        <div class="tr-numbers"><strong>TR's:</strong> ${displayTRs}</div>
                     `;
                     qrContainer.appendChild(div);
                 });
-            } catch (e) { qrContainer.innerHTML = 'Error parsing data.'; }
+            } catch (e) { 
+                qrContainer.innerHTML = 'Error parsing data.'; 
+            }
         }
     </script>
 </body>
