@@ -132,7 +132,6 @@
 <script>
     function renderTracker() {
         try {
-            // 1. Generate the Current Print Date
             const now = new Date();
             const dateOptions = { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' };
             document.getElementById('printDate').innerText = now.toLocaleDateString('en-GB', dateOptions);
@@ -143,7 +142,6 @@
 
             const data = JSON.parse(decodeURIComponent(rawData));
 
-            // 2. Fill Header info
             const masterID = data.MasterID || data.PackageData || "";
             document.getElementById('pkgQR').src = `https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(masterID)}&size=150x150`;
             document.getElementById('trackerIdDisplay').innerText = masterID;
@@ -151,7 +149,6 @@
             document.getElementById('dateDisplay').innerText = data.Date || data.ShipDate || "";
             document.getElementById('cratesTRDisplay').innerText = data.CratesTR || "";
 
-            // 3. Fill Table Rows AND Count TRs/Vouchers
             let rowsHtml = "";
             let countTR = 0;
             let countVoucher = 0;
@@ -164,9 +161,15 @@
                     let safeTR = valTR ? String(valTR).toUpperCase().trim() : "";
                     let safeV = valV ? String(valV).toUpperCase().trim() : "";
 
-                    // 🌟 THE FIX: Count them if they exist
-                    if (safeTR !== "") countTR++;
-                    if (safeV !== "") countVoucher++;
+                    // 🌟 THE FIX: Split by commas/newlines and count the exact number of items!
+                    if (safeTR !== "" && safeTR !== "-") {
+                        let trArray = safeTR.split(/[\n,]+/).filter(x => x.trim() !== '');
+                        countTR += trArray.length;
+                    }
+                    if (safeV !== "" && safeV !== "-") {
+                        let vArray = safeV.split(/[\n,]+/).filter(x => x.trim() !== '');
+                        countVoucher += vArray.length;
+                    }
 
                     let valC = r.C !== undefined ? r.C : (r.Crates !== undefined ? r.Crates : "");
                     let valBx = r.Bx !== undefined ? r.Bx : (r.Box !== undefined ? r.Box : "");
@@ -189,7 +192,7 @@
             }
             document.getElementById('tableBody').innerHTML = rowsHtml;
 
-            // 4. Fill Totals (Including the new TR and Voucher counts)
+            // Update Total Row Data
             document.getElementById('totTRs').innerText = countTR > 0 ? countTR : "";
             document.getElementById('totVouchers').innerText = countVoucher > 0 ? countVoucher : "";
             document.getElementById('totCrates').innerText = data.TC !== undefined ? data.TC : (data.TotalCrates || "");
@@ -197,7 +200,6 @@
             document.getElementById('totFB').innerText = data.TF !== undefined ? data.TF : (data.TotalFb || "");
             document.getElementById('totBags').innerText = data.TBg !== undefined ? data.TBg : (data.TotalBag || data.TotalBags || "");
 
-            // 5. Fill Barcodes
             let bcHtml = "";
             if (data.Barcodes && Array.isArray(data.Barcodes)) {
                 data.Barcodes.forEach(b => {
