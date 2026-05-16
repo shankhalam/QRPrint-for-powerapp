@@ -35,7 +35,7 @@
             font-weight: 900; 
             text-transform: uppercase; 
             margin: 0 0 1.5mm 0; 
-            border-bottom: 2px solid #000; 
+            /* border-bottom: 2px solid #000;  */
             padding-bottom: 2px; 
             line-height: 1; 
             width: 90%;
@@ -50,7 +50,7 @@
         }
 
         .pharmacy-name { 
-            font-size: 13pt !important; 
+            font-size: 15pt !important; 
             font-weight: bold; 
             margin: 0; 
             line-height: 1.1; 
@@ -95,7 +95,7 @@
                     
                     // CHANGE 1 & 2: Updated Header Text, and TR block is completely removed
                     div.innerHTML = `
-                        <div class="header-store">Medicina Internal Transfer</div>
+                        <div class="header-store">Medicina Drug Store - Internal Transfer</div>
                         <img src="${qrCodeURL}">
                         <div class="pharmacy-name">${item.PharmacyName || ''}</div>
                         <div class="container-info">${item.ContainerInfo || ''}</div>
