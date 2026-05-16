@@ -13,12 +13,13 @@
             justify-content: center; align-items: center;
             text-align: center; box-sizing: border-box;
             padding: 5mm; page-break-after: always;
+            overflow: hidden; 
         }
         /* Changed header to make internal transfers visually distinct */
         .header-store { font-size: 11pt; font-weight: 900; text-transform: uppercase; margin-bottom: 1.5mm; border-bottom: 2px solid #000; padding-bottom: 2px;}
         .qr-item img { width: 3.2cm; height: 3.2cm; object-fit: contain; }
         .pharmacy-name { font-size: 14pt !important; font-weight: bold; margin-top: 1.5mm; }
-        .container-info { font-size: 11pt; font-weight: 700; color: #000; margin-top: 1mm; }
+        .container-info { font-size: 11pt; font-weight: 700; color: #000; margin-top: 1mm; margin-bottom: 4mm; }
         .tr-numbers { font-size: 8pt; margin-top: 1mm; max-width: 90%; word-break: break-word; line-height: 1.2; }
         @media print { body { margin: 0; } .qr-item { page-break-after: always; break-after: page; } }
     </style>
