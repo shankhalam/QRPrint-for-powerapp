@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Medicina Internal Delivery Tracker</title>
+    <style>
+        @page { size: A4 portrait; margin: 10mm; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; padding: 0; color: #333; font-size: 11px; }
+        .container { padding: 5mm; }
+        
+        header { border-bottom: 3px solid #1565c0; margin-bottom: 10px; padding-bottom: 8px; width: 100%; }
+        .header-table { width: 100%; border: none; margin: 0; }
+        .header-table td { border: none; padding: 0; vertical-align: middle; }
+        .logo-box img { height: 65px; max-width: 160px; object-fit: contain; }
+        .qr-header-box img { height: 80px; width: 80px; border: 1px solid #ddd; padding: 2px; border-radius: 4px; }
+        .title { font-size: 20pt; font-weight: bold; margin: 0; color: #1565c0; letter-spacing: 0.5px; }
+        .tracker-id { font-size: 11pt; font-weight: 600; margin-top: 4px; color: #555; }
+        
+        .details-table { width: 100%; border: none; margin-bottom: 15px; font-size: 11pt; background-color: #f8f9fa; padding: 8px; border-radius: 6px; }
+        .details-table td { border: none; padding: 3px 5px; text-align: left; }
+        
+        table.data-table { width: 100%; border-collapse: collapse; margin: 15px 0; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        table.data-table th, table.data-table td { border: 1px solid #bdc3c7; padding: 8px; text-align: center; vertical-align: middle; }
+        table.data-table td.multi-line { white-space: pre-wrap; line-height: 1.4; text-align: left; padding-left: 10px; font-weight: 500; }
+        table.data-table th { background-color: #1565c0; font-weight: 600; color: #ffffff; font-size: 10pt; }
+        .total-row { font-weight: bold; background-color: #eaedd0 !important; }
+        table.data-table tbody tr:nth-child(even) { background-color: #fdfdfd; }
+        
+        .ack-section { font-size: 10pt; margin-top: 20px; text-align: justify; border-top: 2px solid #1565c0; padding-top: 12px; margin-bottom: 20px; line-height: 1.5; }
+        
+        .summary-grid { margin-top: 15px; margin-bottom: 25px; display: flex; justify-content: space-between; text-align: center; font-size: 11px; }
+        .grid-card { padding: 8px; border-radius: 6px; flex: 1; margin: 0 4px; border: 1px solid rgba(0,0,0,0.05); }
+        .card-val { font-size: 18px; font-weight: bold; margin-top: 4px; display: block; }
+
+        .barcodes-page { page-break-before: always; text-align: center; padding-top: 10mm; }
+        .barcodes-title { border-bottom: 2px solid #333; padding-bottom: 10px; font-size: 16pt; font-weight: bold; margin-bottom: 20px; color: #1565c0; }
+        .barcode-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 14px; margin-top: 25px; }
+        .barcode-item { border: 1px solid #ddd; padding: 8px; background: #fff; border-radius: 4px; }
+        .barcode-item img { width: 160px; height: 50px; }
+
+        .print-footer { position: fixed; bottom: 5px; right: 15px; font-size: 8pt; color: #666; font-style: italic; }
+    </style>
+</head>
+<body onload="renderTracker()">
+    
+    <div class="print-footer">Printed on: <span id="printDate"></span></div>
+
+    <div class="container" id="mainContent">
+        <header>
+            <table class="header-table">
+                <tr>
+                    <td style="width: 25%;"><div class="logo-box"><img src="MedicinaLogo.png" alt="Medicina Logo"></div></td>
+                    <td style="width: 50%; text-align: center;">
+                        <div class="title">INTERNAL TRANSFER TRACKER</div>
+                        <div class="tracker-id">Tracker ID: <span id="trackerIdDisplay"></span></div>
+                    </td>
+                    <td style="width: 25%; text-align: right;"><div class="qr-header-box"><img id="pkgQR" src=""></div></td>
+                </tr>
+            </table>
+        </header>
+
+        <table class="details-table">
+            <tr>
+                <td style="width: 50%;">From: <strong>Medicina Drug Store</strong></td>
+                <td style="width: 50%; text-align: right;">To: <strong><span id="pharmacyDisplay" style="font-size:13pt; color:#1565c0;"></span></strong></td>
+            </tr>
+            <tr>
+                <td>Date: <strong id="dateDisplay"></strong></td>
+                <td style="text-align: right;">Crates TR: <strong id="cratesTRDisplay"></strong></td>
+            </tr>
+        </table>
+
+        <div class="summary-grid">
+            <div style="background:#e3f2fd;" class="grid-card"><b style="color:#1565c0;">Crates</b><span id="cardCrates" class="card-val" style="color:#1565c0;">0</span></div>
+            <div style="background:#ede7f6;" class="grid-card"><b style="color:#5e35b1;">Bundles</b><span id="cardBundles" class="card-val" style="color:#5e35b1;">0</span></div>
+            <div style="background:#fffde7;" class="grid-card"><b style="color:#f57f17;">Boxes</b><span id="cardBoxes" class="card-val" style="color:#f57f17;">0</span></div>
+            <div style="background:#fbe9e7;" class="grid-card"><b style="color:#d84315;">Fridge</b><span id="cardFridge" class="card-val" style="color:#d84315;">0</span></div>
+            <div style="background:#f1f8e9;" class="grid-card"><b style="color:#2e7d32;">Bags</b><span id="cardBags" class="card-val" style="color:#2e7d32;">0</span></div>
+        </div>
+
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>S.NO</th><th>PACKAGE ID</th><th>TRANSFER NUMBER</th><th>CRATES</th>
+                    <th>BUNDLES</th><th>BOX</th><th>FRIDGE BAG</th><th>BAG</th><th>PACKER</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+            <tr class="total-row">
+                <td>TOTAL</td>
+                <td></td>
+                <td id="totTRs"></td>
+                <td id="totCrates"></td>
+                <td id="totBundles"></td>
+                <td id="totBoxes"></td>
+                <td id="totFB"></td>
+                <td id="totBags"></td>
+                <td></td>
+            </tr>
+        </table>
+        
+        <div class="ack-section">
+            I acknowledge that I have received the crates, bundles, boxes, and fridge bags listed above and confirm my understanding of the acknowledgement and condition provided in the tracker.
+        </div>
+
+        <table style="width: 100%; border-collapse: collapse; border: none; margin-top: 15px;">
+            <tr>
+                <td style="width: 50%; text-align: left; vertical-align: top; border: none; padding: 0;">
+                    Warehouse Lead:<br>
+                    <strong style="font-size: 11pt; color: #1565c0;">Dr. Mohamed Tarek</strong>
+                </td>
+                
+                <td style="width: 50%; vertical-align: top; border: none; padding: 0;">
+                    <table align="right" style="width: 240px; border: 1px solid #333; font-size: 9pt; border-collapse: collapse; text-align: left;">
+                        <tr><td style="border: none; padding: 6px; border-bottom: 1px dashed #ccc;">Received By: &nbsp;__________________</td></tr>
+                        <tr><td style="border: none; padding: 6px; border-bottom: 1px dashed #ccc;">Date: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;__________________</td></tr>
+                        <tr><td style="border: none; padding: 6px;">Signature: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;__________________</td></tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+        
+        <div class="terms-section" style="margin-top: 25px;">
+            <h3>Terms and Conditions</h3>
+            <p>All delivered items shall be subject to inspection upon receipt to verify accuracy, quantity, and condition. Any discrepancies, damages, or other issues must be reported to the Warehouse/Logistics Department within 48 hours of receipt.</p>
+        </div>
+    </div>
+
+    <div class="barcodes-page">
+        <div class="barcodes-title">Package Barcodes</div>
+        <div class="barcode-grid" id="barcodeGrid"></div>
+    </div>
+
+<script>
+    function renderTracker() {
+        try {
+            const now = new Date();
+            const dateOptions = { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' };
+            document.getElementById('printDate').innerText = now.toLocaleDateString('en-GB', dateOptions);
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const rawData = urlParams.get('data');
+            if (!rawData) return;
+
+            const data = JSON.parse(decodeURIComponent(rawData));
+
+            const masterID = data.MasterID || "";
+            document.getElementById('pkgQR').src = `https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(masterID)}&size=150x150`;
+            document.getElementById('trackerIdDisplay').innerText = masterID;
+            document.getElementById('pharmacyDisplay').innerText = data.Pharmacy || "";
+            document.getElementById('dateDisplay').innerText = data.Date || "";
+            document.getElementById('cratesTRDisplay').innerText = data.CratesTR || "-";
+
+            let rowsHtml = "";
+            let countTR = 0;
+            
+            if (data.Rows && Array.isArray(data.Rows)) {
+                data.Rows.forEach((r, index) => {
+                    let valPkg = r.PackageID || "-";
+                    let valTR = r.TR || "";
+                    let valC = r.C !== undefined ? r.C : 0;
+                    let valBndl = r.Bndl !== undefined ? r.Bndl : 0;
+                    let valBx = r.Bx !== undefined ? r.Bx : 0;
+                    let valF = r.F !== undefined ? r.F : 0;
+                    let valBg = r.Bg !== undefined ? r.Bg : 0;
+                    let valP = r.P || "-";
+                    
+                    let safeTR = valTR ? String(valTR).toUpperCase().trim() : "";
+
+                    if (safeTR !== "" && safeTR !== "-") {
+                        let trArray = safeTR.split(/[\n,]+/).filter(x => x.trim() !== '');
+                        countTR += trArray.length;
+                    }
+
+                    rowsHtml += `
+                        <tr>
+                            <td>${index + 1}</td>
+                            <td style="font-weight:600; color:#1565c0;">${valPkg}</td>
+                            <td class="multi-line">${safeTR}</td>
+                            <td>${valC}</td>
+                            <td>${valBndl}</td>
+                            <td>${valBx}</td>
+                            <td>${valF}</td>
+                            <td>${valBg}</td>
+                            <td>${valP}</td> 
+                        </tr>`;
+                });
+            }
+            document.getElementById('tableBody').innerHTML = rowsHtml;
+
+            // Render Card Grid Metrics
+            document.getElementById('cardCrates').innerText = data.TC !== undefined ? data.TC : "0";
+            document.getElementById('cardBundles').innerText = data.TBndl !== undefined ? data.TBndl : "0";
+            document.getElementById('cardBoxes').innerText = data.TBx !== undefined ? data.TBx : "0";
+            document.getElementById('cardFridge').innerText = data.TF !== undefined ? data.TF : "0";
+            document.getElementById('cardBags').innerText = data.TBg !== undefined ? data.TBg : "0";
+
+            // Render Row Totals Bottom Line
+            document.getElementById('totTRs').innerText = countTR > 0 ? countTR : "";
+            document.getElementById('totCrates').innerText = data.TC !== undefined ? data.TC : "";
+            document.getElementById('totBundles').innerText = data.TBndl !== undefined ? data.TBndl : "";
+            document.getElementById('totBoxes').innerText = data.TBx !== undefined ? data.TBx : "";
+            document.getElementById('totFB').innerText = data.TF !== undefined ? data.TF : "";
+            document.getElementById('totBags').innerText = data.TBg !== undefined ? data.TBg : "";
+
+            // Render Sub-Package Barcodes Grid Layout
+            let bcHtml = "";
+            if (data.Barcodes && Array.isArray(data.Barcodes)) {
+                data.Barcodes.forEach(b => {
+                    const codeValue = typeof b === 'object' ? b.Code : b;
+                    if(codeValue) {
+                        bcHtml += `
+                            <div class="barcode-item">
+                                <img src="https://barcode.tec-it.com/barcode.ashx?data=${encodeURIComponent(codeValue)}&code=Code128&dpi=96">
+                                <div style="margin-top:4px; font-weight:600; font-size:8pt;">${codeValue}</div>
+                            </div>`;
+                    }
+                });
+            }
+            document.getElementById('barcodeGrid').innerHTML = bcHtml;
+
+        } catch (e) {
+            console.error("Rendering Error:", e);
+            document.body.innerHTML = "<h1 style='color:red; text-align:center; margin-top:50px;'>Error Loading Tracker: Check Data Stream Alignment</h1>";
+        }
+    }
+</script>
+</body>
+</html>
