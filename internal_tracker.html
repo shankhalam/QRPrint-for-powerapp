@@ -4,47 +4,48 @@
     <meta charset="UTF-8">
     <title>Medicina Internal Delivery Tracker</title>
     <style>
-        @page { size: A4 portrait; margin: 10mm; }
-        body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; padding: 0; color: #2b2d42; font-size: 11px; }
-        .container { padding: 5mm; }
+        @page { size: A4 portrait; margin: 12mm 10mm 12mm 10mm; }
+        body { font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Arial, sans-serif; margin: 0; padding: 0; color: #1e293b; font-size: 11px; background-color: #ffffff; }
+        .container { padding: 2mm; }
         
-        /* New distinct Emerald Teal palette configuration */
-        header { border-bottom: 3px solid #006d77; margin-bottom: 10px; padding-bottom: 8px; width: 100%; }
+        /* Premium Corporate Slate Teal Styling Theme */
+        header { border-bottom: 3px solid #0f4c5c; margin-bottom: 12px; padding-bottom: 10px; width: 100%; }
         .header-table { width: 100%; border: none; margin: 0; }
         .header-table td { border: none; padding: 0; vertical-align: middle; }
-        .logo-box img { height: 65px; max-width: 160px; object-fit: contain; }
-        .qr-header-box img { height: 80px; width: 80px; border: 1px solid #bdc3c7; padding: 2px; border-radius: 4px; }
-        .title { font-size: 19pt; font-weight: bold; margin: 0; color: #006d77; letter-spacing: 0.3px; }
-        .tracker-id { font-size: 11pt; font-weight: 600; margin-top: 4px; color: #555; }
+        .logo-box img { height: 60px; max-width: 150px; object-fit: contain; }
+        .qr-header-box img { height: 75px; width: 75px; border: 1px solid #cbd5e1; padding: 3px; border-radius: 6px; background-color: #fff; }
+        .title { font-size: 18pt; font-weight: 700; margin: 0; color: #0f4c5c; letter-spacing: 0.5px; text-transform: uppercase; }
+        .tracker-id { font-size: 11pt; font-weight: 600; margin-top: 5px; color: #64748b; }
         
-        .details-table { width: 100%; border: none; margin-bottom: 15px; font-size: 11pt; background-color: #f4f7f6; padding: 10px; border-radius: 6px; border-left: 4px solid #006d77; }
-        .details-table td { border: none; padding: 3px 5px; text-align: left; }
+        .details-table { width: 100%; border: none; margin-bottom: 15px; font-size: 10.5pt; background-color: #f8fafc; padding: 12px; border-radius: 8px; border-left: 5px solid #0f4c5c; box-shadow: inset 0 1px 2px rgba(0,0,0,0.02); }
+        .details-table td { border: none; padding: 4px 6px; text-align: left; color: #334155; }
         
-        table.data-table { width: 100%; border-collapse: collapse; margin: 15px 0; }
-        table.data-table th, table.data-table td { border: 1px solid #bdc3c7; padding: 8px; text-align: center; vertical-align: middle; }
-        table.data-table td.multi-line { white-space: pre-wrap; line-height: 1.4; text-align: left; padding-left: 10px; font-weight: 500; }
-        table.data-table th { background-color: #006d77; font-weight: 600; color: #ffffff; font-size: 10pt; }
-        .total-row { font-weight: bold; background-color: #e8f1f2 !important; border-top: 2px solid #006d77; }
-        table.data-table tbody tr:nth-child(even) { background-color: #fafbfc; }
+        table.data-table { width: 100%; border-collapse: collapse; margin: 15px 0; border-radius: 6px; overflow: hidden; }
+        table.data-table th, table.data-table td { border: 1px solid #e2e8f0; padding: 9px 6px; text-align: center; vertical-align: middle; }
+        table.data-table td.multi-line { white-space: pre-wrap; line-height: 1.4; text-align: left; padding-left: 12px; font-weight: 500; color: #0f4c5c; }
+        table.data-table th { background-color: #0f4c5c; font-weight: 600; color: #ffffff; font-size: 9.5pt; letter-spacing: 0.3px; }
+        .total-row { font-weight: bold; background-color: #f1f5f9 !important; border-top: 2px solid #0f4c5c; color: #0f4c5c; }
+        table.data-table tbody tr:nth-child(even) { background-color: #f8fafc; }
         
-        .ack-section { font-size: 10pt; margin-top: 20px; text-align: justify; border-top: 2px solid #006d77; padding-top: 12px; margin-bottom: 20px; line-height: 1.5; color: #4a4e69; }
+        .ack-section { font-size: 10pt; margin-top: 22px; text-align: justify; border-top: 2px solid #e2e8f0; padding-top: 12px; margin-bottom: 20px; line-height: 1.5; color: #475569; font-style: italic; }
         
-        .summary-grid { margin-top: 15px; margin-bottom: 25px; display: flex; justify-content: space-between; text-align: center; font-size: 11px; }
-        .grid-card { padding: 8px; border-radius: 6px; flex: 1; margin: 0 4px; border: 1px solid rgba(0,0,0,0.04); box-shadow: 0 1px 2px rgba(0,0,0,0.02); }
-        .card-val { font-size: 18px; font-weight: bold; margin-top: 4px; display: block; }
+        .summary-grid { margin-top: 5px; margin-bottom: 20px; display: flex; justify-content: space-between; text-align: center; font-size: 11px; }
+        .grid-card { padding: 10px 6px; border-radius: 6px; flex: 1; margin: 0 4px; border: 1px solid #e2e8f0; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
+        .card-val { font-size: 20px; font-weight: 700; margin-top: 5px; display: block; }
 
-        .barcodes-page { page-break-before: always; text-align: center; padding-top: 10mm; }
-        .barcodes-title { border-bottom: 2px solid #006d77; padding-bottom: 10px; font-size: 16pt; font-weight: bold; margin-bottom: 20px; color: #006d77; }
-        .barcode-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 14px; margin-top: 25px; }
-        .barcode-item { border: 1px solid #e0e0e0; padding: 8px; background: #fff; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-        .barcode-item img { width: 160px; height: 50px; }
+        .barcodes-page { page-break-before: always; text-align: center; padding-top: 8mm; }
+        .barcodes-title { border-bottom: 2px solid #0f4c5c; padding-bottom: 12px; font-size: 15pt; font-weight: 700; margin-bottom: 25px; color: #0f4c5c; text-transform: uppercase; letter-spacing: 0.5px; }
+        .barcode-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 16px; margin-top: 20px; }
+        .barcode-item { border: 1px solid #e2e8f0; padding: 10px; background: #fff; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.04); display: inline-block; min-width: 170px; }
+        .barcode-item img { width: 165px; height: 48px; display: block; margin: 0 auto; }
+        .barcode-text { margin-top: 6px; font-weight: 600; font-size: 8.5pt; color: #334155; letter-spacing: 0.5px; }
 
-        .print-footer { position: fixed; bottom: 5px; right: 15px; font-size: 8pt; color: #8395a7; font-style: italic; }
+        .print-footer { position: fixed; bottom: 5px; right: 15px; font-size: 8pt; color: #94a3b8; font-style: italic; }
     </style>
 </head>
 <body onload="renderTracker()">
     
-    <div class="print-footer">Printed on: <span id="printDate"></span></div>
+    <div class="print-footer">Printed via Medicina Logistics System on: <span id="printDate"></span></div>
 
     <div class="container" id="mainContent">
         <header>
@@ -52,7 +53,7 @@
                 <tr>
                     <td style="width: 25%;"><div class="logo-box"><img src="MedicinaLogo.png" alt="Medicina Logo"></div></td>
                     <td style="width: 50%; text-align: center;">
-                        <div class="title">MEDICINA INTERNAL DELIVERY TRACKER</div>
+                        <div class="title">Medicina Internal Delivery Tracker</div>
                         <div class="tracker-id">Tracker ID: <span id="trackerIdDisplay"></span></div>
                     </td>
                     <td style="width: 25%; text-align: right;"><div class="qr-header-box"><img id="pkgQR" src=""></div></td>
@@ -62,34 +63,40 @@
 
         <table class="details-table">
             <tr>
-                <td style="width: 50%;">From: <strong>Medicina Drug Store</strong></td>
-                <td style="width: 50%; text-align: right;">To: <strong><span id="pharmacyDisplay" style="font-size:13pt; color:#006d77;"></span></strong></td>
+                <td style="width: 50%;">Dispatch Location: <strong>Medicina Drug Store Main Depot</strong></td>
+                <td style="width: 50%; text-align: right;">Receiving Unit: <strong><span id="pharmacyDisplay" style="font-size:12.5pt; color:#0f4c5c;"></span></strong></td>
             </tr>
             <tr>
-                <td>Date: <strong id="dateDisplay"></strong></td>
-                <td style="text-align: right;">Crates TR: <strong id="cratesTRDisplay"></strong></td>
+                <td>Shipment Date: <strong id="dateDisplay"></strong></td>
+                <td style="text-align: right;">Crates TR Log: <strong id="cratesTRDisplay"></strong></td>
             </tr>
         </table>
 
         <div class="summary-grid">
-            <div style="background:#e0f2f1;" class="grid-card"><b style="color:#004d40;">Crates</b><span id="cardCrates" class="card-val" style="color:#004d40;">0</span></div>
-            <div style="background:#f3e5f5;" class="grid-card"><b style="color:#4a148c;">Bundles</b><span id="cardBundles" class="card-val" style="color:#4a148c;">0</span></div>
-            <div style="background:#fff8e1;" class="grid-card"><b style="color:#ff6f00;">Boxes</b><span id="cardBoxes" class="card-val" style="color:#ff6f00;">0</span></div>
-            <div style="background:#efebe9;" class="grid-card"><b style="color:#3e2723;">Fridge</b><span id="cardFridge" class="card-val" style="color:#3e2723;">0</span></div>
-            <div style="background:#f1f8e9;" class="grid-card"><b style="color:#1b5e20;">Bags</b><span id="cardBags" class="card-val" style="color:#1b5e20;">0</span></div>
+            <div style="border-top: 4px solid #0f4c5c;" class="grid-card"><b style="color:#0f4c5c;">Total Crates</b><span id="cardCrates" class="card-val" style="color:#0f4c5c;">0</span></div>
+            <div style="border-top: 4px solid #6d597a;" class="grid-card"><b style="color:#6d597a;">Total Bundles</b><span id="cardBundles" class="card-val" style="color:#6d597a;">0</span></div>
+            <div style="border-top: 4px solid #e36414;" class="grid-card"><b style="color:#e36414;">Total Boxes</b><span id="cardBoxes" class="card-val" style="color:#e36414;">0</span></div>
+            <div style="border-top: 4px solid #9a031e;" class="grid-card"><b style="color:#9a031e;">Fridge Bags</b><span id="cardFridge" class="card-val" style="color:#9a031e;">0</span></div>
+            <div style="border-top: 4px solid #2f3e46;" class="grid-card"><b style="color:#2f3e46;">Standard Bags</b><span id="cardBags" class="card-val" style="color:#2f3e46;">0</span></div>
         </div>
 
         <table class="data-table">
             <thead>
                 <tr>
-                    <th>S.NO</th><th>PACKAGE ID</th><th>TRANSFER NUMBER</th><th>CRATES</th>
-                    <th>BC / BNDL</th><th>BOX</th><th>FRIDGE BAG</th><th>BAG</th><th>PACKER</th>
+                    <th style="width: 5%;">S.NO</th>
+                    <th style="width: 20%;">PACKAGE ID</th>
+                    <th style="width: 30%;">TRANSFER NUMBERS</th>
+                    <th style="width: 8%;">CRATES</th>
+                    <th style="width: 8%;">BUNDLES</th>
+                    <th style="width: 8%;">BOXES</th>
+                    <th style="width: 8%;">FRIDGE</th>
+                    <th style="width: 8%;">BAGS</th>
+                    <th style="width: 15%;">ASSIGNED PACKER</th>
                 </tr>
             </thead>
             <tbody id="tableBody"></tbody>
             <tr class="total-row">
-                <td>TOTAL</td>
-                <td></td>
+                <td colspan="2">CONSOLIDATED ROUTE TOTALS</td>
                 <td id="totTRs"></td>
                 <td id="totCrates"></td>
                 <td id="totBundles"></td>
@@ -101,34 +108,34 @@
         </table>
         
         <div class="ack-section">
-            I acknowledge that I have received the crates, bundles, boxes, and fridge bags listed above and confirm my understanding of the acknowledgement and condition provided in the tracker.
+            I hereby acknowledge the hand-over and secure transit configuration of the crates, bundles, boxes, and climate-controlled parcels tabulated above, confirming complete registration within inventory manifests.
         </div>
 
-        <table style="width: 100%; border-collapse: collapse; border: none; margin-top: 15px;">
+        <table style="width: 100%; border-collapse: collapse; border: none; margin-top: 20px;">
             <tr>
-                <td style="width: 50%; text-align: left; vertical-align: top; border: none; padding: 0;">
-                    Warehouse Lead:<br>
-                    <strong style="font-size: 11pt; color: #006d77;">Dr. Mohamed Tarek</strong>
+                <td style="width: 50%; text-align: left; vertical-align: top; border: none; padding: 0; line-height: 1.6;">
+                    Authorized Warehouse Lead:<br>
+                    <strong style="font-size: 11pt; color: #0f4c5c;">Dr. Mohamed Tarek</strong>
                 </td>
                 
                 <td style="width: 50%; vertical-align: top; border: none; padding: 0;">
-                    <table align="right" style="width: 240px; border: 1px solid #006d77; font-size: 9pt; border-collapse: collapse; text-align: left;">
-                        <tr><td style="border: none; padding: 6px; border-bottom: 1px dashed #bdc3c7;">Received By: &nbsp;__________________</td></tr>
-                        <tr><td style="border: none; padding: 6px; border-bottom: 1px dashed #bdc3c7;">Date: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;__________________</td></tr>
-                        <tr><td style="border: none; padding: 6px;">Signature: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;__________________</td></tr>
+                    <table align="right" style="width: 250px; border: 1px solid #0f4c5c; font-size: 9pt; border-collapse: collapse; text-align: left; background: #fafafa; border-radius: 4px;">
+                        <tr><td style="border: none; padding: 8px; border-bottom: 1px dashed #cbd5e1; color:#475569;">Received By: &nbsp;___________________________</td></tr>
+                        <tr><td style="border: none; padding: 8px; border-bottom: 1px dashed #cbd5e1; color:#475569;">Delivery Date: &nbsp;___________________________</td></tr>
+                        <tr><td style="border: none; padding: 8px; color:#475569;">Signature: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;___________________________</td></tr>
                     </table>
                 </td>
             </tr>
         </table>
         
-        <div class="terms-section" style="margin-top: 25px;">
-            <h3>Terms and Conditions</h3>
-            <p>All delivered items shall be subject to inspection upon receipt to verify accuracy, quantity, and condition. Any discrepancies, damages, or other issues must be reported to the Warehouse/Logistics Department within 48 hours of receipt.</p>
+        <div class="terms-section" style="margin-top: 30px; border-top: 1px solid #e2e8f0; padding-top: 10px;">
+            <h3 style="font-size: 10pt; color: #475569; margin-bottom: 4px;">Security & Discrepancy Protocol</h3>
+            <p style="font-size: 8.5pt; color: #64748b; margin: 0; line-height: 1.4;">All dispatched logistical modules remain subject to immediate barcode reconciliation upon physical arrival. Any manifest variances, box seal breaches, or product count anomalies must be filed directly with the Central Logistics Desk within a strict 48-hour operational window.</p>
         </div>
     </div>
 
     <div class="barcodes-page">
-        <div class="barcodes-title">Package Barcodes</div>
+        <div class="barcodes-title">Package Barcodes Manifest</div>
         <div class="barcode-grid" id="barcodeGrid"></div>
     </div>
 
@@ -150,7 +157,9 @@
             document.getElementById('trackerIdDisplay').innerText = masterID;
             document.getElementById('pharmacyDisplay').innerText = data.Pharmacy || "";
             document.getElementById('dateDisplay').innerText = data.Date || "";
-            document.getElementById('cratesTRDisplay').innerText = data.CratesTR || "";
+            
+            // Render CratesTR text safely - leaves plain/blank space if evaluated as empty string
+            document.getElementById('cratesTRDisplay').innerText = (data.CratesTR && data.CratesTR.trim() !== "") ? data.CratesTR : "";
 
             let rowsHtml = "";
             let countTR = 0;
@@ -176,7 +185,7 @@
                     rowsHtml += `
                         <tr>
                             <td>${index + 1}</td>
-                            <td style="font-weight:600; color:#006d77;">${valPkg}</td>
+                            <td style="font-weight:600; color:#0f4c5c;">${valPkg}</td>
                             <td class="multi-line">${safeTR}</td>
                             <td>${valC}</td>
                             <td>${valBndl}</td>
@@ -202,24 +211,26 @@
             document.getElementById('totFB').innerText = data.TF !== undefined ? data.TF : "";
             document.getElementById('totBags').innerText = data.TBg !== undefined ? data.TBg : "";
 
+            // Defensive Barcode Loop: Leaves it plain text / filters missing parameters smoothly
             let bcHtml = "";
             if (data.Barcodes && Array.isArray(data.Barcodes)) {
                 data.Barcodes.forEach(b => {
                     const codeValue = typeof b === 'object' ? b.Code : b;
-                    if(codeValue) {
+                    // Strict defensive layout filter: render barcode image only if string exists and is valid
+                    if (codeValue && codeValue.trim() !== "" && codeValue !== "undefined" && codeValue !== "0") {
                         bcHtml += `
                             <div class="barcode-item">
                                 <img src="https://barcode.tec-it.com/barcode.ashx?data=${encodeURIComponent(codeValue)}&code=Code128&dpi=96">
-                                <div style="margin-top:4px; font-weight:600; font-size:8pt; color:#333;">${codeValue}</div>
+                                <div class="barcode-text">${codeValue}</div>
                             </div>`;
                     }
                 });
             }
-            document.getElementById('barcodeGrid').innerHTML = bcHtml;
+            document.getElementById('barcodeGrid').innerHTML = bcHtml || "<div style='color:#64748b; font-style:italic;'>No sub-package barcodes registered for this delivery sequence.</div>";
 
         } catch (e) {
             console.error("Rendering Error:", e);
-            document.body.innerHTML = "<h1 style='color:red; text-align:center; margin-top:50px;'>Error Loading Tracker: Check Data Stream Alignment</h1>";
+            document.body.innerHTML = "<h1 style='color:#9a031e; text-align:center; margin-top:50px;'>Error Syncing Tracker: Check Data Integrity Map</h1>";
         }
     }
 </script>
