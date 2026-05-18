@@ -5,40 +5,41 @@
     <title>Medicina Internal Delivery Tracker</title>
     <style>
         @page { size: A4 portrait; margin: 10mm; }
-        body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; padding: 0; color: #333; font-size: 11px; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; padding: 0; color: #2b2d42; font-size: 11px; }
         .container { padding: 5mm; }
         
-        header { border-bottom: 3px solid #1565c0; margin-bottom: 10px; padding-bottom: 8px; width: 100%; }
+        /* New distinct Emerald Teal palette configuration */
+        header { border-bottom: 3px solid #006d77; margin-bottom: 10px; padding-bottom: 8px; width: 100%; }
         .header-table { width: 100%; border: none; margin: 0; }
         .header-table td { border: none; padding: 0; vertical-align: middle; }
         .logo-box img { height: 65px; max-width: 160px; object-fit: contain; }
-        .qr-header-box img { height: 80px; width: 80px; border: 1px solid #ddd; padding: 2px; border-radius: 4px; }
-        .title { font-size: 20pt; font-weight: bold; margin: 0; color: #1565c0; letter-spacing: 0.5px; }
+        .qr-header-box img { height: 80px; width: 80px; border: 1px solid #bdc3c7; padding: 2px; border-radius: 4px; }
+        .title { font-size: 19pt; font-weight: bold; margin: 0; color: #006d77; letter-spacing: 0.3px; }
         .tracker-id { font-size: 11pt; font-weight: 600; margin-top: 4px; color: #555; }
         
-        .details-table { width: 100%; border: none; margin-bottom: 15px; font-size: 11pt; background-color: #f8f9fa; padding: 8px; border-radius: 6px; }
+        .details-table { width: 100%; border: none; margin-bottom: 15px; font-size: 11pt; background-color: #f4f7f6; padding: 10px; border-radius: 6px; border-left: 4px solid #006d77; }
         .details-table td { border: none; padding: 3px 5px; text-align: left; }
         
-        table.data-table { width: 100%; border-collapse: collapse; margin: 15px 0; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        table.data-table { width: 100%; border-collapse: collapse; margin: 15px 0; }
         table.data-table th, table.data-table td { border: 1px solid #bdc3c7; padding: 8px; text-align: center; vertical-align: middle; }
         table.data-table td.multi-line { white-space: pre-wrap; line-height: 1.4; text-align: left; padding-left: 10px; font-weight: 500; }
-        table.data-table th { background-color: #1565c0; font-weight: 600; color: #ffffff; font-size: 10pt; }
-        .total-row { font-weight: bold; background-color: #eaedd0 !important; }
-        table.data-table tbody tr:nth-child(even) { background-color: #fdfdfd; }
+        table.data-table th { background-color: #006d77; font-weight: 600; color: #ffffff; font-size: 10pt; }
+        .total-row { font-weight: bold; background-color: #e8f1f2 !important; border-top: 2px solid #006d77; }
+        table.data-table tbody tr:nth-child(even) { background-color: #fafbfc; }
         
-        .ack-section { font-size: 10pt; margin-top: 20px; text-align: justify; border-top: 2px solid #1565c0; padding-top: 12px; margin-bottom: 20px; line-height: 1.5; }
+        .ack-section { font-size: 10pt; margin-top: 20px; text-align: justify; border-top: 2px solid #006d77; padding-top: 12px; margin-bottom: 20px; line-height: 1.5; color: #4a4e69; }
         
         .summary-grid { margin-top: 15px; margin-bottom: 25px; display: flex; justify-content: space-between; text-align: center; font-size: 11px; }
-        .grid-card { padding: 8px; border-radius: 6px; flex: 1; margin: 0 4px; border: 1px solid rgba(0,0,0,0.05); }
+        .grid-card { padding: 8px; border-radius: 6px; flex: 1; margin: 0 4px; border: 1px solid rgba(0,0,0,0.04); box-shadow: 0 1px 2px rgba(0,0,0,0.02); }
         .card-val { font-size: 18px; font-weight: bold; margin-top: 4px; display: block; }
 
         .barcodes-page { page-break-before: always; text-align: center; padding-top: 10mm; }
-        .barcodes-title { border-bottom: 2px solid #333; padding-bottom: 10px; font-size: 16pt; font-weight: bold; margin-bottom: 20px; color: #1565c0; }
+        .barcodes-title { border-bottom: 2px solid #006d77; padding-bottom: 10px; font-size: 16pt; font-weight: bold; margin-bottom: 20px; color: #006d77; }
         .barcode-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 14px; margin-top: 25px; }
-        .barcode-item { border: 1px solid #ddd; padding: 8px; background: #fff; border-radius: 4px; }
+        .barcode-item { border: 1px solid #e0e0e0; padding: 8px; background: #fff; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
         .barcode-item img { width: 160px; height: 50px; }
 
-        .print-footer { position: fixed; bottom: 5px; right: 15px; font-size: 8pt; color: #666; font-style: italic; }
+        .print-footer { position: fixed; bottom: 5px; right: 15px; font-size: 8pt; color: #8395a7; font-style: italic; }
     </style>
 </head>
 <body onload="renderTracker()">
@@ -51,7 +52,7 @@
                 <tr>
                     <td style="width: 25%;"><div class="logo-box"><img src="MedicinaLogo.png" alt="Medicina Logo"></div></td>
                     <td style="width: 50%; text-align: center;">
-                        <div class="title">INTERNAL TRANSFER TRACKER</div>
+                        <div class="title">MEDICINA INTERNAL DELIVERY TRACKER</div>
                         <div class="tracker-id">Tracker ID: <span id="trackerIdDisplay"></span></div>
                     </td>
                     <td style="width: 25%; text-align: right;"><div class="qr-header-box"><img id="pkgQR" src=""></div></td>
@@ -62,7 +63,7 @@
         <table class="details-table">
             <tr>
                 <td style="width: 50%;">From: <strong>Medicina Drug Store</strong></td>
-                <td style="width: 50%; text-align: right;">To: <strong><span id="pharmacyDisplay" style="font-size:13pt; color:#1565c0;"></span></strong></td>
+                <td style="width: 50%; text-align: right;">To: <strong><span id="pharmacyDisplay" style="font-size:13pt; color:#006d77;"></span></strong></td>
             </tr>
             <tr>
                 <td>Date: <strong id="dateDisplay"></strong></td>
@@ -71,18 +72,18 @@
         </table>
 
         <div class="summary-grid">
-            <div style="background:#e3f2fd;" class="grid-card"><b style="color:#1565c0;">Crates</b><span id="cardCrates" class="card-val" style="color:#1565c0;">0</span></div>
-            <div style="background:#ede7f6;" class="grid-card"><b style="color:#5e35b1;">Bundles</b><span id="cardBundles" class="card-val" style="color:#5e35b1;">0</span></div>
-            <div style="background:#fffde7;" class="grid-card"><b style="color:#f57f17;">Boxes</b><span id="cardBoxes" class="card-val" style="color:#f57f17;">0</span></div>
-            <div style="background:#fbe9e7;" class="grid-card"><b style="color:#d84315;">Fridge</b><span id="cardFridge" class="card-val" style="color:#d84315;">0</span></div>
-            <div style="background:#f1f8e9;" class="grid-card"><b style="color:#2e7d32;">Bags</b><span id="cardBags" class="card-val" style="color:#2e7d32;">0</span></div>
+            <div style="background:#e0f2f1;" class="grid-card"><b style="color:#004d40;">Crates</b><span id="cardCrates" class="card-val" style="color:#004d40;">0</span></div>
+            <div style="background:#f3e5f5;" class="grid-card"><b style="color:#4a148c;">Bundles</b><span id="cardBundles" class="card-val" style="color:#4a148c;">0</span></div>
+            <div style="background:#fff8e1;" class="grid-card"><b style="color:#ff6f00;">Boxes</b><span id="cardBoxes" class="card-val" style="color:#ff6f00;">0</span></div>
+            <div style="background:#efebe9;" class="grid-card"><b style="color:#3e2723;">Fridge</b><span id="cardFridge" class="card-val" style="color:#3e2723;">0</span></div>
+            <div style="background:#f1f8e9;" class="grid-card"><b style="color:#1b5e20;">Bags</b><span id="cardBags" class="card-val" style="color:#1b5e20;">0</span></div>
         </div>
 
         <table class="data-table">
             <thead>
                 <tr>
                     <th>S.NO</th><th>PACKAGE ID</th><th>TRANSFER NUMBER</th><th>CRATES</th>
-                    <th>BUNDLES</th><th>BOX</th><th>FRIDGE BAG</th><th>BAG</th><th>PACKER</th>
+                    <th>BC / BNDL</th><th>BOX</th><th>FRIDGE BAG</th><th>BAG</th><th>PACKER</th>
                 </tr>
             </thead>
             <tbody id="tableBody"></tbody>
@@ -107,13 +108,13 @@
             <tr>
                 <td style="width: 50%; text-align: left; vertical-align: top; border: none; padding: 0;">
                     Warehouse Lead:<br>
-                    <strong style="font-size: 11pt; color: #1565c0;">Dr. Mohamed Tarek</strong>
+                    <strong style="font-size: 11pt; color: #006d77;">Dr. Mohamed Tarek</strong>
                 </td>
                 
                 <td style="width: 50%; vertical-align: top; border: none; padding: 0;">
-                    <table align="right" style="width: 240px; border: 1px solid #333; font-size: 9pt; border-collapse: collapse; text-align: left;">
-                        <tr><td style="border: none; padding: 6px; border-bottom: 1px dashed #ccc;">Received By: &nbsp;__________________</td></tr>
-                        <tr><td style="border: none; padding: 6px; border-bottom: 1px dashed #ccc;">Date: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;__________________</td></tr>
+                    <table align="right" style="width: 240px; border: 1px solid #006d77; font-size: 9pt; border-collapse: collapse; text-align: left;">
+                        <tr><td style="border: none; padding: 6px; border-bottom: 1px dashed #bdc3c7;">Received By: &nbsp;__________________</td></tr>
+                        <tr><td style="border: none; padding: 6px; border-bottom: 1px dashed #bdc3c7;">Date: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;__________________</td></tr>
                         <tr><td style="border: none; padding: 6px;">Signature: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;__________________</td></tr>
                     </table>
                 </td>
@@ -149,7 +150,7 @@
             document.getElementById('trackerIdDisplay').innerText = masterID;
             document.getElementById('pharmacyDisplay').innerText = data.Pharmacy || "";
             document.getElementById('dateDisplay').innerText = data.Date || "";
-            document.getElementById('cratesTRDisplay').innerText = data.CratesTR || "-";
+            document.getElementById('cratesTRDisplay').innerText = data.CratesTR || "";
 
             let rowsHtml = "";
             let countTR = 0;
@@ -175,7 +176,7 @@
                     rowsHtml += `
                         <tr>
                             <td>${index + 1}</td>
-                            <td style="font-weight:600; color:#1565c0;">${valPkg}</td>
+                            <td style="font-weight:600; color:#006d77;">${valPkg}</td>
                             <td class="multi-line">${safeTR}</td>
                             <td>${valC}</td>
                             <td>${valBndl}</td>
@@ -188,14 +189,12 @@
             }
             document.getElementById('tableBody').innerHTML = rowsHtml;
 
-            // Render Card Grid Metrics
             document.getElementById('cardCrates').innerText = data.TC !== undefined ? data.TC : "0";
             document.getElementById('cardBundles').innerText = data.TBndl !== undefined ? data.TBndl : "0";
             document.getElementById('cardBoxes').innerText = data.TBx !== undefined ? data.TBx : "0";
             document.getElementById('cardFridge').innerText = data.TF !== undefined ? data.TF : "0";
             document.getElementById('cardBags').innerText = data.TBg !== undefined ? data.TBg : "0";
 
-            // Render Row Totals Bottom Line
             document.getElementById('totTRs').innerText = countTR > 0 ? countTR : "";
             document.getElementById('totCrates').innerText = data.TC !== undefined ? data.TC : "";
             document.getElementById('totBundles').innerText = data.TBndl !== undefined ? data.TBndl : "";
@@ -203,7 +202,6 @@
             document.getElementById('totFB').innerText = data.TF !== undefined ? data.TF : "";
             document.getElementById('totBags').innerText = data.TBg !== undefined ? data.TBg : "";
 
-            // Render Sub-Package Barcodes Grid Layout
             let bcHtml = "";
             if (data.Barcodes && Array.isArray(data.Barcodes)) {
                 data.Barcodes.forEach(b => {
@@ -212,7 +210,7 @@
                         bcHtml += `
                             <div class="barcode-item">
                                 <img src="https://barcode.tec-it.com/barcode.ashx?data=${encodeURIComponent(codeValue)}&code=Code128&dpi=96">
-                                <div style="margin-top:4px; font-weight:600; font-size:8pt;">${codeValue}</div>
+                                <div style="margin-top:4px; font-weight:600; font-size:8pt; color:#333;">${codeValue}</div>
                             </div>`;
                     }
                 });
