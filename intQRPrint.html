@@ -15,7 +15,6 @@
             background: #fff; 
         }
 
-        /* THE FIX: Shrunk to 5.9cm, anchored to top, overflow hidden to stop cutoff */
         .qr-item {
             width: 10cm; 
             height: 5.9cm; 
@@ -35,7 +34,6 @@
             font-weight: 900; 
             text-transform: uppercase; 
             margin: 0 0 1.5mm 0; 
-            /* border-bottom: 2px solid #000;  */
             padding-bottom: 2px; 
             line-height: 1; 
             width: 90%;
@@ -89,16 +87,18 @@
                     const qrCodeURL = "https://api.qrserver.com/v1/create-qr-code/?data=" + 
                                      encodeURIComponent(item.BarcodeID) + "&size=300x300";
                     
+                    // 🌟 FIX: Check if BundleDetails exists, and format it with brackets!
+                    const extraText = item.BundleDetails ? `(${item.BundleDetails})` : '';
+                    
                     // Build the HTML for the label
                     const div = document.createElement('div');
                     div.className = 'qr-item';
-                    
-                    // CHANGE 1 & 2: Updated Header Text, and TR block is completely removed
                     div.innerHTML = `
                         <div class="header-store">Medicina Drug Store - Internal Transfer</div>
                         <img src="${qrCodeURL}">
                         <div class="pharmacy-name">${item.PharmacyName || ''}</div>
-                        <div class="container-info">${item.ContainerInfo || ''}</div>
+                        
+                        <div class="container-info">${item.ContainerInfo || ''}${extraText}</div>
                     `;
                     qrContainer.appendChild(div);
                 });
